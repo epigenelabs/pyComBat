@@ -1,0 +1,863 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>utils &mdash; pyComBat 0.4.4 documentation</title>
+  
+
+  
+  
+    <link rel="shortcut icon" href="../_static/epigenelogo_favicon.png"/>
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> pyComBat
+          
+
+          
+            
+            <img src="../_static/epigenelogo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">pyComBat</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Module code</a> &raquo;</li>
+        
+      <li>utils</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="k">import</span> <span class="n">exp</span>
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="k">import</span> <span class="n">Pool</span><span class="p">,</span> <span class="n">cpu_count</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">partial</span>
+<span class="kn">import</span> <span class="nn">mpmath</span> <span class="k">as</span> <span class="nn">mp</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">import</span> <span class="nn">unittest</span>
+
+
+<span class="k">def</span> <span class="nf">model_matrix</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Creates the model_matrix from batch list</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        batch {list} -- batch list from main arguments</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        matrix -- model matrix generate from batch list</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">list_elts_batch</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+        <span class="nb">set</span><span class="p">(</span><span class="n">batch</span><span class="p">))</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+    <span class="n">n_batch</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_elts_batch</span><span class="p">)</span>
+    <span class="n">dict_batch</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="n">mat</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_batch</span><span class="p">)]</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_batch</span><span class="p">):</span>
+        <span class="n">dict_batch</span><span class="p">[</span><span class="n">list_elts_batch</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">i</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">mat</span><span class="p">[</span><span class="n">dict_batch</span><span class="p">[</span><span class="n">batch</span><span class="p">[</span><span class="n">i</span><span class="p">]]][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">mat</span>
+
+
+<span class="k">def</span> <span class="nf">all_1</span><span class="p">(</span><span class="n">list_of_elements</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;checks if all elements in a list are 1s</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        list_of_elements {list} -- list of elements</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool -- True iff all elements of the list are 1s</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">list_of_elements</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_of_elements</span><span class="p">))</span>
+
+<span class="c1"># aprior and bprior are useful to compute &quot;hyper-prior values&quot;</span>
+<span class="c1"># -&gt; prior parameters used to estimate the prior gamma distribution for multiplicative batch effect</span>
+<span class="c1"># aprior - calculates empirical hyper-prior values</span>
+
+<span class="k">def</span> <span class="nf">compute_prior</span><span class="p">(</span><span class="n">prior</span><span class="p">,</span> <span class="n">gamma_hat</span><span class="p">,</span> <span class="n">mean_only</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;[summary]</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        prior {char} -- &#39;a&#39; or &#39;b&#39; depending of the prior to be calculated</span>
+<span class="sd">        gamma_hat {matrix} -- matrix of additive batch effect</span>
+<span class="sd">        mean_only {bool} -- True iff mean_only selected</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float -- [the prior calculated (aprior or bprior)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">mean_only</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">gamma_hat</span><span class="p">)</span>
+    <span class="n">s2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">gamma_hat</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">prior</span> <span class="o">==</span> <span class="s1">&#39;a&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">s2</span><span class="o">+</span><span class="n">m</span><span class="o">*</span><span class="n">m</span><span class="p">)</span><span class="o">/</span><span class="n">s2</span>
+    <span class="k">elif</span> <span class="n">prior</span> <span class="o">==</span> <span class="s1">&#39;b&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">m</span><span class="o">*</span><span class="n">s2</span><span class="o">+</span><span class="n">m</span><span class="o">*</span><span class="n">m</span><span class="o">*</span><span class="n">m</span><span class="p">)</span><span class="o">/</span><span class="n">s2</span>
+
+
+<span class="k">def</span> <span class="nf">postmean</span><span class="p">(</span><span class="n">g_bar</span><span class="p">,</span> <span class="n">d_star</span><span class="p">,</span> <span class="n">t2_n</span><span class="p">,</span> <span class="n">t2_n_g_hat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;estimates additive batch effect</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        g_bar {matrix} -- additive batch effect</span>
+<span class="sd">        d_star {matrix} -- multiplicative batch effect</span>
+<span class="sd">        t2_n {matrix} -- </span>
+<span class="sd">        t2_n_g_hat {matrix} -- </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        matrix -- estimated additive batch effect</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">(</span><span class="n">t2_n_g_hat</span><span class="o">+</span><span class="n">d_star</span><span class="o">*</span><span class="n">g_bar</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">t2_n</span><span class="o">+</span><span class="n">d_star</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">postvar</span><span class="p">(</span><span class="n">sum2</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;estimates multiplicative batch effect</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        sum2 {vector} -- </span>
+<span class="sd">        n {[type]} -- </span>
+<span class="sd">        a {float} -- aprior</span>
+<span class="sd">        b {float} -- bprior</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        matrix -- estimated multiplicative batch effect</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">divide</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">sum2</span><span class="p">)</span><span class="o">+</span><span class="n">b</span><span class="p">),</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span><span class="o">+</span><span class="n">a</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+
+
+<span class="k">def</span> <span class="nf">it_sol</span><span class="p">(</span><span class="n">sdat</span><span class="p">,</span> <span class="n">g_hat</span><span class="p">,</span> <span class="n">d_hat</span><span class="p">,</span> <span class="n">g_bar</span><span class="p">,</span> <span class="n">t2</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">conv</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span> <span class="n">exit_iteration</span><span class="o">=</span><span class="mf">10e5</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;iterative solution for Empirical Bayesian method</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        sdat {matrix} -- </span>
+<span class="sd">        g_hat {matrix} -- average additive batch effect</span>
+<span class="sd">        d_hat {matrix} -- average multiplicative batch effect</span>
+<span class="sd">        g_bar {matrix} -- additive batch effect</span>
+<span class="sd">        t2 {matrix} -- </span>
+<span class="sd">        a {float} -- aprior</span>
+<span class="sd">        b {float} -- bprior</span>
+
+<span class="sd">    Keyword Arguments:</span>
+<span class="sd">        conv {float} -- convergence criterion (default: {0.0001})</span>
+<span class="sd">        exit_iteration {float} -- maximum number of iterations before exit (default: {10e5})</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        array list -- estimated additive and multiplicative batch effect</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">sdat</span><span class="p">)]</span>
+    <span class="n">t2_n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">t2</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">t2_n_g_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">t2_n</span><span class="p">,</span> <span class="n">g_hat</span><span class="p">)</span>
+    <span class="n">g_old</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">g_hat</span><span class="p">)</span>
+    <span class="n">d_old</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">d_hat</span><span class="p">)</span>
+    <span class="n">change</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># number of steps needed (for diagnostic only)</span>
+    <span class="c1"># convergence criteria, if new-old &lt; conv, then stop</span>
+    <span class="k">while</span> <span class="p">(</span><span class="n">change</span> <span class="o">&gt;</span> <span class="n">conv</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">count</span> <span class="o">&lt;</span> <span class="n">exit_iteration</span><span class="p">):</span>
+        <span class="n">g_new</span> <span class="o">=</span> <span class="n">postmean</span><span class="p">(</span><span class="n">g_bar</span><span class="p">,</span> <span class="n">d_old</span><span class="p">,</span> <span class="n">t2_n</span><span class="p">,</span> <span class="n">t2_n_g_hat</span><span class="p">)</span>  <span class="c1"># updated additive batch effect</span>
+        <span class="n">sum2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span>
+            <span class="n">sdat</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">g_new</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ma</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">sdat</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))))),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">d_new</span> <span class="o">=</span> <span class="n">postvar</span><span class="p">(</span><span class="n">sum2</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>  <span class="c1"># updated multiplicative batch effect</span>
+        <span class="n">change</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">g_new</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">g_old</span><span class="p">))</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">g_old</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">d_new</span><span class="o">-</span><span class="n">d_old</span><span class="p">)</span><span class="o">/</span><span class="n">d_old</span><span class="p">))</span>  <span class="c1"># maximum difference between new and old estimate</span>
+        <span class="n">g_old</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">g_new</span><span class="p">)</span>  <span class="c1"># save value for g</span>
+        <span class="n">d_old</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">d_new</span><span class="p">)</span>  <span class="c1"># save value for d</span>
+        <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">adjust</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">g_new</span><span class="p">,</span> <span class="n">d_new</span><span class="p">])</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">adjust</span><span class="p">)</span>  <span class="c1"># remove parenthesis in returns</span>
+
+<span class="c1"># int_eprior - Monte Carlo integration function to find nonparametric adjustments</span>
+<span class="c1"># Johnson et al (Biostatistics 2007, supp.mat.) show that we can estimate the multiplicative and additive batch effects with an integral</span>
+<span class="c1"># This integral is numerically computed through Monte Carlo inegration (iterative method)</span>
+
+
+<span class="k">def</span> <span class="nf">int_eprior</span><span class="p">(</span><span class="n">sdat</span><span class="p">,</span> <span class="n">g_hat</span><span class="p">,</span> <span class="n">d_hat</span><span class="p">,</span> <span class="n">precision</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; int_eprior - Monte Carlo integration function to find nonparametric adjustments</span>
+<span class="sd">        Johnson et al (Biostatistics 2007, supp.mat.) show that we can estimate the multiplicative and additive batch effects with an integral</span>
+<span class="sd">        This integral is numerically computed through Monte Carlo inegration (iterative method)</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        sdat {matrix} -- data matrix</span>
+<span class="sd">        g_hat {matrix} -- average additive batch effect</span>
+<span class="sd">        d_hat {matrix} -- average multiplicative batch effect</span>
+<span class="sd">        precision {float} -- level of precision for precision computing</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        array list -- estimated additive and multiplicative batch effect</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">g_star</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">d_star</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># use this variable to only print error message once if approximation used</span>
+    <span class="n">test_approximation</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sdat</span><span class="p">)):</span>
+        <span class="c1"># additive batch effect</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">g_hat</span><span class="p">),</span> <span class="n">i</span><span class="p">))</span>
+        <span class="c1"># multiplicative batch effect</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">d_hat</span><span class="p">),</span> <span class="n">i</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">sdat</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">n</span>
+        <span class="n">dat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">g</span><span class="p">)),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">resid2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">dat</span><span class="o">-</span><span class="n">g</span><span class="p">)</span>
+        <span class="n">sum2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">resid2</span><span class="p">),</span> <span class="n">j</span><span class="p">)</span>
+        <span class="c1"># /begin{handling high precision computing}</span>
+        <span class="n">temp_2d</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">d</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">precision</span> <span class="o">==</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">LH</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">temp_2d</span><span class="p">),</span> <span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">negative</span><span class="p">(</span><span class="n">sum2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">temp_2d</span><span class="p">))</span>
+
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># only if precision parameter informed</span>
+            <span class="c1"># increase the precision of the computing (if negative exponential too close to 0)</span>
+            <span class="n">mp</span><span class="o">.</span><span class="n">dps</span> <span class="o">=</span> <span class="n">precision</span>
+            <span class="n">buf_exp</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">mp</span><span class="o">.</span><span class="n">exp</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">negative</span><span class="p">(</span><span class="n">sum2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">temp_2d</span><span class="p">)))</span>
+            <span class="n">buf_pow</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">mp</span><span class="o">.</span><span class="n">power</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">temp_2d</span><span class="p">)))</span>
+            <span class="n">LH</span> <span class="o">=</span> <span class="n">buf_pow</span><span class="o">*</span><span class="n">buf_exp</span>  <span class="c1"># likelihood</span>
+        <span class="c1"># /end{handling high precision computing}</span>
+        <span class="n">LH</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">LH</span><span class="p">)</span>  <span class="c1"># corrects NaNs in likelihood</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">LH</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">test_approximation</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># correction for LH full of 0.0</span>
+            <span class="n">test_approximation</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># this message won&#39;t appear again</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;###</span><span class="se">\n</span><span class="s2">Values too small, approximation applied to avoid division by 0.</span><span class="se">\n</span><span class="s2">Precision mode can correct this problem, but increases computation time.</span><span class="se">\n</span><span class="s2">###&quot;</span><span class="p">)</span>
+            <span class="n">LH</span><span class="p">[</span><span class="n">LH</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">745</span><span class="p">)</span>
+            <span class="n">g_star</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">g</span><span class="o">*</span><span class="n">LH</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">LH</span><span class="p">))</span>
+            <span class="n">d_star</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">d</span><span class="o">*</span><span class="n">LH</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">LH</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">g_star</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">g</span><span class="o">*</span><span class="n">LH</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">LH</span><span class="p">))</span>
+            <span class="n">d_star</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">d</span><span class="o">*</span><span class="n">LH</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">LH</span><span class="p">))</span>
+    <span class="n">adjust</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">g_star</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">d_star</span><span class="p">)])</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">adjust</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">param_fun</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">s_data</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">mean_only</span><span class="p">,</span> <span class="n">gamma_hat</span><span class="p">,</span> <span class="n">gamma_bar</span><span class="p">,</span> <span class="n">delta_hat</span><span class="p">,</span> <span class="n">t2</span><span class="p">,</span> <span class="n">a_prior</span><span class="p">,</span> <span class="n">b_prior</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;parametric estimation of batch effects</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        i {int} -- column index</span>
+<span class="sd">        s_data {matrix} -- </span>
+<span class="sd">        batches {list list} -- list of list of batches&#39; elements</span>
+<span class="sd">        mean_only {bool} -- True iff mean_only selected</span>
+<span class="sd">        gamma_hat {matrix} -- average additive batch effect</span>
+<span class="sd">        gamma_bar {matrix} -- estimated additive batch effect</span>
+<span class="sd">        delta_hat {matrix} -- average multiplicative batch effect</span>
+<span class="sd">        t2 {matrix} -- </span>
+<span class="sd">        a_prior {float} -- aprior</span>
+<span class="sd">        b_prior {float} -- bprior</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        array list -- estimated adjusted additive and multiplicative batch effect</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">mean_only</span><span class="p">:</span>  <span class="c1"># if mean_only, no need for complex method: batch effect is immediately calculated</span>
+        <span class="n">t2_n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">t2</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">t2_n_g_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">t2_n</span><span class="p">,</span> <span class="n">gamma_hat</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">gamma_star</span> <span class="o">=</span> <span class="n">postmean</span><span class="p">(</span><span class="n">gamma_bar</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="mi">1</span><span class="p">,</span> <span class="n">t2_n</span><span class="p">,</span> <span class="n">t2_n_g_hat</span><span class="p">)</span>  <span class="c1"># additive batch effect</span>
+        <span class="n">delta_star</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">s_data</span><span class="p">)</span>  <span class="c1"># multiplicative batch effect</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># if not(mean_only) then use it_solve</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">it_sol</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">s_data</span><span class="p">)[</span>
+                      <span class="n">batches</span><span class="p">[</span><span class="n">i</span><span class="p">]]),</span> <span class="n">gamma_hat</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">delta_hat</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">gamma_bar</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">t2</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">a_prior</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">b_prior</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">gamma_star</span> <span class="o">=</span> <span class="n">temp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># additive batch effect</span>
+        <span class="n">delta_star</span> <span class="o">=</span> <span class="n">temp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># multiplicative batch effect</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">gamma_star</span><span class="p">,</span> <span class="n">delta_star</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">nonparam_fun</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">mean_only</span><span class="p">,</span> <span class="n">delta_hat</span><span class="p">,</span> <span class="n">s_data</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">gamma_hat</span><span class="p">,</span> <span class="n">precision</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;non-parametric estimation</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        i {int} -- column index</span>
+<span class="sd">        mean_only {bool} -- True iff mean_only selected</span>
+<span class="sd">        delta_hat {matrix} -- estimated multiplicative batch effect</span>
+<span class="sd">        s_data {matrix} -- </span>
+<span class="sd">        batches {list list} -- list of list of batches&#39; elements</span>
+<span class="sd">        gamma_hat {matrix} -- estimated additive batch effect</span>
+<span class="sd">        precision {float} -- level of precision for precision computing</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        array list -- estimated adjusted additive and multiplicative batch effect</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">mean_only</span><span class="p">:</span>  <span class="c1"># if mean only, change delta_hat to vector of 1s</span>
+        <span class="n">delta_hat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">delta_hat</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="c1"># use int_eprior for non-parametric estimation</span>
+    <span class="n">temp</span> <span class="o">=</span> <span class="n">int_eprior</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">s_data</span><span class="p">)[</span>
+                      <span class="n">batches</span><span class="p">[</span><span class="n">i</span><span class="p">]]),</span> <span class="n">gamma_hat</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">delta_hat</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">precision</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">temp</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">temp</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+
+<span class="c1">############</span>
+<span class="c1"># pyComBat #</span>
+<span class="c1">############</span>
+
+
+<span class="k">def</span> <span class="nf">check_mean_only</span><span class="p">(</span><span class="n">mean_only</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;checks mean_only option</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        mean_only {boolean} -- user&#39;s choice about mean_only</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">mean_only</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using mean only version&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">define_batchmod</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;generates model matrix</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        batch {list} -- list of batch id</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        batchmod {matrix} -- model matrix for batches</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">batchmod</span> <span class="o">=</span> <span class="n">model_matrix</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">batchmod</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">check_ref_batch</span><span class="p">(</span><span class="n">ref_batch</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batchmod</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;check ref_batch option and treat it if needed</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        ref_batch {int} -- the reference batch</span>
+<span class="sd">        batch {list} -- list of batch id</span>
+<span class="sd">        batchmod {matrix} -- model matrix related to batches</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ref {int list} -- the corresponding positions of the reference batch in the batch list</span>
+<span class="sd">        batchmod {matrix} -- updated model matrix related to batches, with reference</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">ref_batch</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ref_batch</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reference level ref.batch must be one of the levels of batch.&quot;</span><span class="p">)</span>
+            <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using batch &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">ref_batch</span><span class="p">)</span> <span class="o">+</span>
+              <span class="s2">&quot; as a reference batch.&quot;</span><span class="p">)</span>
+        <span class="c1"># ref keeps in memory the columns concerned by the reference batch</span>
+        <span class="n">ref</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span> <span class="o">==</span> <span class="n">ref_batch</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># updates batchmod with reference</span>
+        <span class="n">batchmod</span><span class="p">[</span><span class="n">ref</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">batchmod</span><span class="p">[</span><span class="n">ref</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ref</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># default settings</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">batchmod</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">treat_batches</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;treat batches</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        batch {list} -- batch list</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        n_batch {int} -- number of batches</span>
+<span class="sd">        batches {int list} -- list of unique batches</span>
+<span class="sd">        n_batches {int list} -- list of batches lengths </span>
+<span class="sd">        n_array {int} -- total size of dataset</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_batch</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">batch</span><span class="p">))</span>  <span class="c1"># number of batches</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Found &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">n_batch</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; batches.&quot;</span><span class="p">)</span>
+    <span class="n">batches</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># list of lists, contains the list of position for each batch</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_batch</span><span class="p">):</span>
+        <span class="n">batches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">batch</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">batch</span><span class="p">)[</span><span class="n">i</span><span class="p">])[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">batches</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">batches</span><span class="p">)</span>
+    <span class="n">n_batches</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="n">batches</span><span class="p">))</span>
+    <span class="k">if</span> <span class="mi">1</span> <span class="ow">in</span> <span class="n">n_batches</span><span class="p">:</span>
+        <span class="c1">#mean_only = True  # no variance if only one sample in a batch - mean_only has to be used</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;One batch has only one sample, try setting mean_only=True.&quot;</span><span class="p">)</span>
+    <span class="n">n_array</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">n_batches</span><span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">n_batch</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">n_batches</span><span class="p">,</span> <span class="n">n_array</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">treat_covariates</span><span class="p">(</span><span class="n">batchmod</span><span class="p">,</span> <span class="n">mod</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;treat covariates</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        batchmod {matrix} -- model matrix for batch</span>
+<span class="sd">        mod {matrix} -- model matrix for other covariates</span>
+<span class="sd">        ref {int} -- reference batch</span>
+<span class="sd">        n_batch {int} -- number of batches</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        check {bool list} -- a list characterising all covariates</span>
+<span class="sd">        design {matrix} -- model matrix for all covariates, including batch</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">design</span> <span class="o">=</span> <span class="n">batchmod</span> <span class="o">+</span> \
+        <span class="n">mod</span>  <span class="c1"># general matrix containing the information about the different covariates (batch included)</span>
+    <span class="c1"># design matrix for sample conditions</span>
+    <span class="n">check</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">all_1</span><span class="p">,</span> <span class="n">design</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">ref</span><span class="p">:</span>  <span class="c1"># if ref</span>
+        <span class="n">check</span><span class="p">[</span><span class="n">ref</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># the reference in not considered as a covariate</span>
+    <span class="n">design</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">design</span><span class="p">)</span>
+    <span class="n">design</span> <span class="o">=</span> <span class="n">design</span><span class="p">[[</span><span class="ow">not</span> <span class="n">el</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">check</span><span class="p">]]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Adjusting for &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">design</span><span class="p">)</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">batchmod</span><span class="p">))</span> <span class="o">+</span>
+          <span class="s2">&quot; covariate(s) or covariate level(s).&quot;</span><span class="p">)</span>
+
+    <span class="c1"># if matrix cannot be invertible, different cases</span>
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_rank</span><span class="p">(</span><span class="n">design</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">design</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">design</span><span class="p">)</span> <span class="o">==</span> <span class="n">n_batch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># case 1: covariate confunded with a batch</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;The covariate is confunded with batch. Remove the covariate and rerun pyComBat.&quot;</span><span class="p">)</span>
+            <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">design</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">n_batch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># case 2: multiple covariates confunded with a batch</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_rank</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">design</span><span class="p">)[:</span><span class="n">n_batch</span><span class="p">])</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">design</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="s2">&quot;The covariates are confounded! Please remove one or more of the covariates so the design is not confounded.&quot;</span><span class="p">)</span>
+                <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># case 3: at least a covariate confunded with a batch</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="s2">&quot;At least one covariate is confounded with batch. Please remove confounded covariates and rerun pyComBat&quot;</span><span class="p">)</span>
+                <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">design</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">check_NAs</span><span class="p">(</span><span class="n">dat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;check if NaNs - in theory, we construct the data without NAs</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        dat {matrix} -- the data matrix</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        NAs {bool} -- boolean characterising the presence of NaNs in the data matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># NAs = True in (np.isnan(dat))</span>
+    <span class="n">NAs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dat</span><span class="p">))</span>  <span class="c1"># Check if NaN exists</span>
+    <span class="k">if</span> <span class="n">NAs</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Found missing data values.&quot;</span><span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">NAs</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">calculate_mean_var</span><span class="p">(</span><span class="n">design</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">NAs</span><span class="p">,</span> <span class="n">ref_batch</span><span class="p">,</span> <span class="n">n_batches</span><span class="p">,</span> <span class="n">n_array</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; calculates the Normalisation factors</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        design {matrix} -- model matrix for all covariates</span>
+<span class="sd">        batches {int list} -- list of unique batches</span>
+<span class="sd">        dat {matrix} -- data matrix</span>
+<span class="sd">        NAs {bool} -- presence of NaNs in the data matrix</span>
+<span class="sd">        ref_batch {int} -- reference batch</span>
+<span class="sd">        n_batches {int list} -- list of batches lengths </span>
+<span class="sd">        n_array {int} -- total size of dataset</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        B_hat {matrix} -- regression coefficients corresponding to the design matrix</span>
+<span class="sd">        grand_mean {matrix} -- Mean for each gene and each batch</span>
+<span class="sd">        var_pooled {matrix} -- Variance for each gene and each batch</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Standardizing Data across genes.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">NAs</span><span class="p">):</span>  <span class="c1"># NAs not supported</span>
+        <span class="c1"># B_hat is the vector of regression coefficients corresponding to the design matrix</span>
+        <span class="n">B_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">design</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span>
+            <span class="n">design</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">design</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">dat</span><span class="p">)))</span>
+
+    <span class="c1"># Calculates the general mean</span>
+    <span class="k">if</span> <span class="n">ref_batch</span><span class="p">:</span>
+        <span class="n">grand_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">B_hat</span><span class="p">[</span><span class="n">ref</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">grand_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">i</span> <span class="o">/</span> <span class="n">n_array</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">n_batches</span><span class="p">]),</span> <span class="n">B_hat</span><span class="p">)</span>
+    <span class="c1"># Calculates the general variance</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">NAs</span><span class="p">:</span>  <span class="c1"># NAs not supported</span>
+        <span class="k">if</span> <span class="n">ref_batch</span><span class="p">:</span>  <span class="c1"># depending on ref batch</span>
+            <span class="n">ref_dat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">dat</span><span class="p">)[</span><span class="n">batches</span><span class="p">[</span><span class="n">ref</span><span class="p">]])</span>
+            <span class="n">var_pooled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">ref_dat</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span>
+                <span class="n">design</span><span class="p">)[</span><span class="n">batches</span><span class="p">[</span><span class="n">ref</span><span class="p">]],</span> <span class="n">B_hat</span><span class="p">))),</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">n_batches</span><span class="p">[</span><span class="n">ref</span><span class="p">]]</span><span class="o">*</span><span class="n">n_batches</span><span class="p">[</span><span class="n">ref</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">var_pooled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span>
+                <span class="n">dat</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">design</span><span class="p">),</span> <span class="n">B_hat</span><span class="p">))),</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">n_array</span><span class="p">]</span><span class="o">*</span><span class="n">n_array</span><span class="p">)</span>
+
+    <span class="k">return</span><span class="p">(</span><span class="n">B_hat</span><span class="p">,</span> <span class="n">grand_mean</span><span class="p">,</span> <span class="n">var_pooled</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">calculate_stand_mean</span><span class="p">(</span><span class="n">grand_mean</span><span class="p">,</span> <span class="n">n_array</span><span class="p">,</span> <span class="n">design</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">,</span> <span class="n">B_hat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; transform the format of the mean for substraction</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        grand_mean {matrix} -- Mean for each gene and each batch</span>
+<span class="sd">        n_array {int} -- total size of dataset</span>
+<span class="sd">        design {[type]} -- design matrix for all covariates including batch</span>
+<span class="sd">        n_batch {int} -- number of batches</span>
+<span class="sd">        B_hat {matrix} -- regression coefficients corresponding to the design matrix</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        stand_mean {matrix} -- standardised mean</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">stand_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mat</span><span class="p">(</span><span class="n">grand_mean</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">mat</span><span class="p">([</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">n_array</span><span class="p">))</span>
+    <span class="c1"># corrects the mean with design matrix information</span>
+    <span class="k">if</span> <span class="n">design</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">design</span><span class="p">)</span>
+        <span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">n_batch</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">stand_mean</span> <span class="o">=</span> <span class="n">stand_mean</span> <span class="o">+</span> \
+            <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">tmp</span><span class="p">),</span> <span class="n">B_hat</span><span class="p">))</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">stand_mean</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">standardise_data</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">stand_mean</span><span class="p">,</span> <span class="n">var_pooled</span><span class="p">,</span> <span class="n">n_array</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;standardise the data: substract mean and divide by variance</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        dat {matrix} -- data matrix</span>
+<span class="sd">        stand_mean {matrix} -- standardised mean</span>
+<span class="sd">        var_pooled {matrix} -- Variance for each gene and each batch</span>
+<span class="sd">        n_array {int} -- total size of dataset</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        s_data {matrix} -- standardised data matrix</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">s_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">dat</span> <span class="o">-</span> <span class="n">stand_mean</span><span class="p">)</span> <span class="o">/</span> \
+        <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mat</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">var_pooled</span><span class="p">))),</span> <span class="n">np</span><span class="o">.</span><span class="n">mat</span><span class="p">([</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">n_array</span><span class="p">))</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">s_data</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">fit_model</span><span class="p">(</span><span class="n">design</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">,</span> <span class="n">s_data</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">mean_only</span><span class="p">,</span> <span class="n">par_prior</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">ref_batch</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">NAs</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Fitting L/S model and finding priors.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># fraction of design matrix related to batches</span>
+    <span class="n">batch_design</span> <span class="o">=</span> <span class="n">design</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">n_batch</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">NAs</span><span class="p">:</span>  <span class="c1"># CF SUPRA FOR NAs</span>
+        <span class="c1"># gamma_hat is the vector of additive batch effect</span>
+        <span class="n">gamma_hat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">batch_design</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">batch_design</span><span class="p">)),</span>
+                                    <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">batch_design</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">s_data</span><span class="p">)))</span>
+
+    <span class="n">delta_hat</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># delta_hat is the vector of estimated multiplicative batch effect</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">mean_only</span><span class="p">):</span>
+        <span class="c1"># no variance if mean_only == True</span>
+        <span class="n">delta_hat</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">s_data</span><span class="p">))]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">batches</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">batches</span><span class="p">:</span>  <span class="c1"># feed incrementally delta_hat</span>
+            <span class="n">list_map</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">s_data</span><span class="p">)[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">var</span><span class="p">(</span>
+                <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># variance for each row</span>
+            <span class="n">delta_hat</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">list_map</span><span class="p">)))</span>
+
+    <span class="n">gamma_bar</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">gamma_hat</span><span class="p">))</span>  <span class="c1"># vector of means for gamma_hat</span>
+    <span class="n">t2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">,</span> <span class="n">gamma_hat</span><span class="p">))</span>  <span class="c1"># vector of variances for gamma_hat</span>
+
+    <span class="c1"># calculates hyper priors for gamma (additive batch effect)</span>
+    <span class="n">a_prior</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+        <span class="nb">map</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">compute_prior</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">mean_only</span><span class="o">=</span><span class="n">mean_only</span><span class="p">),</span> <span class="n">delta_hat</span><span class="p">))</span>
+    <span class="n">b_prior</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+        <span class="nb">map</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">compute_prior</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">mean_only</span><span class="o">=</span><span class="n">mean_only</span><span class="p">),</span> <span class="n">delta_hat</span><span class="p">))</span>
+
+    <span class="c1"># initialise gamma and delta for parameters estimation</span>
+    <span class="n">gamma_star</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n_batch</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">s_data</span><span class="p">)))</span>
+    <span class="n">delta_star</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">n_batch</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">s_data</span><span class="p">)))</span>
+
+    <span class="k">if</span> <span class="n">par_prior</span><span class="p">:</span>
+        <span class="c1"># use param_fun function for parametric adjustments (cf. function definition)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finding parametric adjustments.&quot;</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">param_fun</span><span class="p">,</span>
+                                   <span class="n">s_data</span><span class="o">=</span><span class="n">s_data</span><span class="p">,</span>
+                                   <span class="n">batches</span><span class="o">=</span><span class="n">batches</span><span class="p">,</span>
+                                   <span class="n">mean_only</span><span class="o">=</span><span class="n">mean_only</span><span class="p">,</span>
+                                   <span class="n">gamma_hat</span><span class="o">=</span><span class="n">gamma_hat</span><span class="p">,</span>
+                                   <span class="n">gamma_bar</span><span class="o">=</span><span class="n">gamma_bar</span><span class="p">,</span>
+                                   <span class="n">delta_hat</span><span class="o">=</span><span class="n">delta_hat</span><span class="p">,</span>
+                                   <span class="n">t2</span><span class="o">=</span><span class="n">t2</span><span class="p">,</span>
+                                   <span class="n">a_prior</span><span class="o">=</span><span class="n">a_prior</span><span class="p">,</span>
+                                   <span class="n">b_prior</span><span class="o">=</span><span class="n">b_prior</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_batch</span><span class="p">)))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># use nonparam_fun for non-parametric adjustments (cf. function definition)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finding nonparametric adjustments&quot;</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">nonparam_fun</span><span class="p">,</span> <span class="n">mean_only</span><span class="o">=</span><span class="n">mean_only</span><span class="p">,</span> <span class="n">delta_hat</span><span class="o">=</span><span class="n">delta_hat</span><span class="p">,</span>
+                                   <span class="n">s_data</span><span class="o">=</span><span class="n">s_data</span><span class="p">,</span> <span class="n">batches</span><span class="o">=</span><span class="n">batches</span><span class="p">,</span> <span class="n">gamma_hat</span><span class="o">=</span><span class="n">gamma_hat</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="n">precision</span><span class="p">),</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_batch</span><span class="p">)))</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_batch</span><span class="p">):</span>  <span class="c1"># store the results in gamma/delta_star</span>
+        <span class="n">results_i</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">gamma_star</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">delta_star</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">results_i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">results_i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># update if reference batch (the reference batch is not supposed to be modified)</span>
+    <span class="k">if</span> <span class="n">ref_batch</span><span class="p">:</span>
+        <span class="n">len_gamma_star_ref</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">gamma_star</span><span class="p">[</span><span class="n">ref</span><span class="p">])</span>
+        <span class="n">gamma_star</span><span class="p">[</span><span class="n">ref</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">len_gamma_star_ref</span>
+        <span class="n">delta_star</span><span class="p">[</span><span class="n">ref</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">len_gamma_star_ref</span>
+
+    <span class="k">return</span><span class="p">(</span><span class="n">gamma_star</span><span class="p">,</span> <span class="n">delta_star</span><span class="p">,</span> <span class="n">batch_design</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">adjust_data</span><span class="p">(</span><span class="n">s_data</span><span class="p">,</span> <span class="n">gamma_star</span><span class="p">,</span> <span class="n">delta_star</span><span class="p">,</span> <span class="n">batch_design</span><span class="p">,</span> <span class="n">n_batches</span><span class="p">,</span> <span class="n">var_pooled</span><span class="p">,</span> <span class="n">stand_mean</span><span class="p">,</span> <span class="n">n_array</span><span class="p">,</span> <span class="n">ref_batch</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">dat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Adjust the data -- corrects for estimated batch effects</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        s_data {matrix} -- standardised data matrix</span>
+<span class="sd">        gamma_star {matrix} -- estimated additive batch effect</span>
+<span class="sd">        delta_star {matrix} -- estimated multiplicative batch effect</span>
+<span class="sd">        batch_design {matrix} -- information about batches in design matrix</span>
+<span class="sd">        n_batches {int list} -- list of batches lengths </span>
+<span class="sd">        stand_mean {matrix} -- standardised mean</span>
+<span class="sd">        var_pooled {matrix} -- Variance for each gene and each batch</span>
+<span class="sd">        n_array {int} -- total size of dataset</span>
+<span class="sd">        ref_batch {int} -- reference batch</span>
+<span class="sd">        ref {int list} -- the corresponding positions of the reference batch in the batch list</span>
+<span class="sd">        batches {int list} -- list of unique batches</span>
+<span class="sd">        dat</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bayes_data [matrix] -- data adjusted for correction of batch effects</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Now we adjust the data:</span>
+    <span class="c1"># 1. substract additive batch effect (gamma_star)</span>
+    <span class="c1"># 2. divide by multiplicative batch effect (delta_star)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Adjusting the Data&quot;</span><span class="p">)</span>
+    <span class="n">bayes_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">s_data</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">batches</span><span class="p">:</span>  <span class="c1"># for each batch, specific correction</span>
+        <span class="n">bayes_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">bayes_data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">batch_design</span><span class="p">)[</span><span class="n">i</span><span class="p">],</span> <span class="n">gamma_star</span><span class="p">))</span> <span class="o">/</span> \
+            <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">delta_star</span><span class="p">[</span><span class="n">j</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">n_batches</span><span class="p">[</span><span class="n">j</span><span class="p">])))</span>
+        <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="c1"># renormalise the data after correction:</span>
+    <span class="c1"># 1. multiply by variance</span>
+    <span class="c1"># 2. add mean</span>
+    <span class="n">bayes_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">bayes_data</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">var_pooled</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">n_array</span><span class="p">)))</span> <span class="o">+</span> <span class="n">stand_mean</span>
+
+    <span class="c1"># correction for reference batch</span>
+    <span class="k">if</span> <span class="n">ref_batch</span><span class="p">:</span>
+        <span class="n">bayes_data</span><span class="p">[</span><span class="n">batches</span><span class="p">[</span><span class="n">ref</span><span class="p">]]</span> <span class="o">=</span> <span class="n">dat</span><span class="p">[</span><span class="n">batches</span><span class="p">[</span><span class="n">ref</span><span class="p">]]</span>
+
+    <span class="c1"># returns the data corrected for batch effects</span>
+    <span class="k">return</span> <span class="n">bayes_data</span>
+
+
+<div class="viewcode-block" id="pycombat"><a class="viewcode-back" href="../index.html#utils.pycombat">[docs]</a><span class="k">def</span> <span class="nf">pycombat</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">mod</span><span class="o">=</span><span class="p">[],</span> <span class="n">par_prior</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">prior_plots</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">mean_only</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">ref_batch</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">precision</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Corrects batch effect in microarray expression data. Takes an gene expression file and a list of known batches corresponding to each sample.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        dat {matrix} -- The expression matrix. It contains the information about the gene expression (rows) for each sample (columns). The first column (resp. row) are reserved for the genes (resp. sample) names.</span>
+
+<span class="sd">        batch {list} -- List of batch indexes. The batch list describes the batch for each sample. The batches list has as many elements as the number of columns in the expression matrix.</span>
+
+<span class="sd">    Keyword Arguments:</span>
+<span class="sd">        mod {list} -- list of mods (default: {[]})</span>
+
+<span class="sd">        par_prior {bool} -- False for non-parametric estimation of batch effects (default: {True})</span>
+
+<span class="sd">        prior_plots {bool} -- True if requires to plot the priors (default: {False} -- Not implemented yet!)</span>
+
+<span class="sd">        mean_only {bool} -- True iff just adjusting the means and not individual batch effects (default: {False})</span>
+
+<span class="sd">        ref_batch {int} -- reference batch selected (default: {None})</span>
+
+<span class="sd">        precision {float} -- level of precision for precision computing (default: {None})</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        matrix -- The data table adjusted for batch effects. By default, pyComBat creates a numpy object containing a matrix, corresponding to the input expression matrix, corrected for batch effects. You can use the function export_pyComBat (described below) to export your results in different formats.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">check_mean_only</span><span class="p">(</span><span class="n">mean_only</span><span class="p">)</span>
+
+    <span class="n">batchmod</span> <span class="o">=</span> <span class="n">define_batchmod</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+    <span class="n">ref</span><span class="p">,</span> <span class="n">batchmod</span> <span class="o">=</span> <span class="n">check_ref_batch</span><span class="p">(</span><span class="n">ref_batch</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batchmod</span><span class="p">)</span>
+    <span class="n">n_batch</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">n_batches</span><span class="p">,</span> <span class="n">n_array</span> <span class="o">=</span> <span class="n">treat_batches</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+    <span class="n">design</span> <span class="o">=</span> <span class="n">treat_covariates</span><span class="p">(</span><span class="n">batchmod</span><span class="p">,</span> <span class="n">mod</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">)</span>
+    <span class="n">NAs</span> <span class="o">=</span> <span class="n">check_NAs</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
+    <span class="n">B_hat</span><span class="p">,</span> <span class="n">grand_mean</span><span class="p">,</span> <span class="n">var_pooled</span> <span class="o">=</span> <span class="n">calculate_mean_var</span><span class="p">(</span>
+        <span class="n">design</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">NAs</span><span class="p">,</span> <span class="n">ref_batch</span><span class="p">,</span> <span class="n">n_batches</span><span class="p">,</span> <span class="n">n_array</span><span class="p">)</span>
+    <span class="n">stand_mean</span> <span class="o">=</span> <span class="n">calculate_stand_mean</span><span class="p">(</span>
+        <span class="n">grand_mean</span><span class="p">,</span> <span class="n">n_array</span><span class="p">,</span> <span class="n">design</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">,</span> <span class="n">B_hat</span><span class="p">)</span>
+    <span class="n">s_data</span> <span class="o">=</span> <span class="n">standardise_data</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">stand_mean</span><span class="p">,</span> <span class="n">var_pooled</span><span class="p">,</span> <span class="n">n_array</span><span class="p">)</span>
+    <span class="n">gamma_star</span><span class="p">,</span> <span class="n">delta_star</span><span class="p">,</span> <span class="n">batch_design</span> <span class="o">=</span> <span class="n">fit_model</span><span class="p">(</span>
+        <span class="n">design</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">,</span> <span class="n">s_data</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">mean_only</span><span class="p">,</span> <span class="n">par_prior</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">ref_batch</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">NAs</span><span class="p">)</span>
+    <span class="n">bayes_data</span> <span class="o">=</span> <span class="n">adjust_data</span><span class="p">(</span><span class="n">s_data</span><span class="p">,</span> <span class="n">gamma_star</span><span class="p">,</span> <span class="n">delta_star</span><span class="p">,</span> <span class="n">batch_design</span><span class="p">,</span>
+                             <span class="n">n_batches</span><span class="p">,</span> <span class="n">var_pooled</span><span class="p">,</span> <span class="n">stand_mean</span><span class="p">,</span> <span class="n">n_array</span><span class="p">,</span> <span class="n">ref_batch</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">dat</span><span class="p">)</span>
+    <span class="k">return</span><span class="p">(</span><span class="n">bayes_data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="export_pycombat"><a class="viewcode-back" href="../index.html#utils.export_pycombat">[docs]</a><span class="k">def</span> <span class="nf">export_pycombat</span><span class="p">(</span><span class="n">bayes_data</span><span class="p">,</span> <span class="n">sample_names</span><span class="p">,</span> <span class="n">gene_names</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;result&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;pkl&quot;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Exports an expression matrix corrected for batch effects in a pickle or csv file</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        bayes_data {matrix} -- a (corrected) expression matrix</span>
+
+<span class="sd">        sample_names {list} -- a list of sample_names, len(sample_names) == ncol(bayes_data)</span>
+
+<span class="sd">        gene_names {list} -- a list of gene_names, len(gene_names) == nrow(bayes_data)</span>
+
+<span class="sd">    Keyword Arguments:</span>
+<span class="sd">        name {str} -- name of the export file (default: {&quot;result&quot;})</span>
+
+<span class="sd">        format {str} -- format of the export file. If csv, exports a csv file, else a pkl (default: {&quot;pkl&quot;})</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">results_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="n">bayes_data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">sample_names</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">gene_names</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">format</span> <span class="o">==</span> <span class="s2">&quot;csv&quot;</span><span class="p">:</span>
+        <span class="n">results_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.csv&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">results_df</span><span class="o">.</span><span class="n">to_pickle</span><span class="p">(</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.pkl&#39;</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Abdelkader Behdenna
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    
+
+  <style>
+    /* Sidebar header (and topbar for mobile) */
+    .wy-side-nav-search, .wy-nav-top {
+      background: #333333;
+    }
+    /* Sidebar */
+    .wy-nav-side {
+      background: #6600CC;
+    }
+    /* functions */
+    /* .rst-content dl:not(.docutils) dt {
+      background: #B0F0F7;
+      border-top: #10DDBA;
+    } */
+  </style>
+
+
+</body>
+</html>

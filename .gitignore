@@ -69,4 +69,4 @@ rsconnect/
 *.toc
 
 # doc files
-build/
+# build/
