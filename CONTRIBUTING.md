@@ -51,7 +51,7 @@ Ideas to enhance and complete unit testing for pyComBat are welcome. Please foll
 
 ### Writing documentation
 
-pyComBat uses [Sphinx](https://www.sphinx-doc.org/en/master/usage/quickstart.html) to automatically document the main scripts. You can use the following command to build the documentation:
+pyComBat uses [Sphinx](https://www.sphinx-doc.org/en/master/usage/quickstart.html) to automatically document the main scripts. You can use the following command to build the documentation (from the docs folder):
 
 ```bash
 sphinx-build -b html source/ .
