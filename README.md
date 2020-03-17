@@ -24,14 +24,14 @@ We list here the versions of the paquages that have been used for development/te
 
 ## Usage example
 
+Note that you need to download the utils.py script and put it in the same folder as the rest of your code. We are currently working on making on making pyComBat usable as a Python library.
+
 The simplest way of using pyComBat is to first import it, and simply use the pycombat function with default parameters:
 
 ```python
 from utils import pycombat
 pycombat(data,batch)
 ```
-
-Note that you need to download the utils.py script and put it in the same folder as the rest of you code. We are currently working on making on making pyComBat usable as a Python library.
 
 * data: The expression matrix. It contains the information about the gene expression (rows) for each sample (columns). The first column (resp. row) is dedicated for the gene (resp. sample) names.
 

@@ -70,3 +70,7 @@ rsconnect/
 
 # doc files
 # build/
+
+# build files
+pyComBat_test.egg-info/
+dist/
