@@ -16,14 +16,14 @@ You have **many** ways to contribute to the pyComBat project, and make it succes
 
 ### Adding a feature
 
-If you want to implement a new interesting feature, please start by posting about your idea, and discuss it with the community. Once we all agreed that the idea is good and feasible, you can start coding!
+If you want to implement a new interesting feature, please start by posting about your idea as an issue with `enhancement` tag. You are encourage to discuss it with the community and experts! Once all the necessary information is gathered, and that the idea is good (accepted by the community or urgently important) and feasible, you can start to contribute through pull requests!
 
 ### Signaling (and/or solving) an issue
 
-Please start by searching amongst the issue if the bug has already been signaled, and post about it if not.
-If you have any question, don't hesitate to contact us.
+Please start by searching amongst the issues list if the bug has already been signaled, and post about it if not.
+Vigilante is very much appreciated, help us to spot if any issues is a duplicate. If you have any question, don't hesitate to contact us.
 
-*PLEASE USE PULL REQUEST ONCE YOU ARE FINISHED CODING.*
+*PLEASE USE PULL REQUEST IF YOU WANT TO CONTRIBUTE.*
 
 ### Testing pyComBat on new datasets
 
@@ -32,6 +32,8 @@ We believe that the best way of increasing pyComBat robustness is to use it on a
 If you have data that can be of use in terms of testing pyComBat (and maybe discovering new possible bufs), please provide any benchmarking results you can produce, as well as the corresponding data, if possible.
 
 In the case where you find any new bug, please refer to the previous section of this document.
+
+Again, all actions should go through the pull request process!
 
 ## More ways of contributing
 
