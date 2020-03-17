@@ -68,9 +68,7 @@ rsconnect/
 *.gz
 *.toc
 
-# doc files
-# build/
-
 # build files
+build/
 pyComBat_test.egg-info/
 dist/
