@@ -7,9 +7,6 @@ import pandas as pd
 
 import unittest
 
-# for diagnostic purposes - raises all warning messages as exceptions
-# np.seterr(all='raise')
-
 
 def model_matrix(batch):
     """Creates the model_matrix from batch list
@@ -21,7 +18,7 @@ def model_matrix(batch):
         matrix -- model matrix generate from batch list
     """
     list_elts_batch = list(
-        set(batch))  # use set for listing unique elements in batch list
+        set(batch))
     n = len(batch)
     n_batch = len(list_elts_batch)
     dict_batch = {}
@@ -46,17 +43,11 @@ def all_1(list_of_elements):
     Returns:
         bool -- True iff all elements of the list are 1s
     """
-    # return all(element == 1 for element in list_of_elements) x2 computing time
     return(sum(list_of_elements) == len(list_of_elements))
-
-# applies not to a boolean, for mapping purposes
-# def not_tab(elt):
-#     return not(elt) ## change for list comprehension
 
 # aprior and bprior are useful to compute "hyper-prior values"
 # -> prior parameters used to estimate the prior gamma distribution for multiplicative batch effect
 # aprior - calculates empirical hyper-prior values
-
 
 def compute_prior(prior, gamma_hat, mean_only):
     """[summary]
@@ -70,28 +61,13 @@ def compute_prior(prior, gamma_hat, mean_only):
         float -- [the prior calculated (aprior or bprior)
     """
     if mean_only:
-        return 1  # uninformative prior if mean only ## do this test in code body
+        return 1
     m = np.mean(gamma_hat)
     s2 = np.var(gamma_hat)
     if prior == 'a':
         return (2*s2+m*m)/s2
     elif prior == 'b':
         return (m*s2+m*m*m)/s2
-# def aprior(gamma_hat, mean_only):
-#     if mean_only:
-#         return 1 # uninformative prior if mean only ## do this test in code body
-#     else:
-#         m = np.mean(gamma_hat) ## calculate m in code below
-#         s2 = np.var(gamma_hat) ## calculate s2 in code below
-#         return (2*s2+m*m)/s2
-# # bprior - calculates empirical hyper-prior values
-# def bprior(gamma_hat, mean_only):
-#     if mean_only:
-#         return 1 # uninformative prior if mean only
-#     else:
-#         m = np.mean(gamma_hat)
-#         s2 = np.var(gamma_hat)
-#         return (m*s2+m*m*m)/s2
 
 
 def postmean(g_bar, d_star, t2_n, t2_n_g_hat):
@@ -147,23 +123,19 @@ def it_sol(sdat, g_hat, d_hat, g_bar, t2, a, b, conv=0.0001, exit_iteration=10e5
     n = [len(i) for i in np.asarray(sdat)]
     t2_n = np.multiply(t2, n)
     t2_n_g_hat = np.multiply(t2_n, g_hat)
-    # start from g_hat (prior for additive batch effect)
     g_old = np.ndarray.copy(g_hat)
-    # start from d_hat (prior for multiplicative batch effect)
     d_old = np.ndarray.copy(d_hat)
     change = 1
     count = 0  # number of steps needed (for diagnostic only)
-    # convergence criteria, if new-old < conv, then stop ## put exit door to exit if no convergence
+    # convergence criteria, if new-old < conv, then stop
     while (change > conv) and (count < exit_iteration):
-        # updated additive batch effect
-        g_new = postmean(g_bar, d_old, t2_n, t2_n_g_hat)
+        g_new = postmean(g_bar, d_old, t2_n, t2_n_g_hat)  # updated additive batch effect
         sum2 = np.sum(np.asarray(np.square(
             sdat-np.outer(g_new[0][0], np.ones(np.ma.size(sdat, axis=1))))), axis=1)
         d_new = postvar(sum2, n, a, b)  # updated multiplicative batch effect
         change = max(np.amax(np.absolute(g_new-np.asarray(g_old))/np.asarray(g_old)), np.amax(
             np.absolute(d_new-d_old)/d_old))  # maximum difference between new and old estimate
-        # save value for g ## check if necessary to generate g_old and d_old for the last step
-        g_old = np.ndarray.copy(g_new)
+        g_old = np.ndarray.copy(g_new)  # save value for g
         d_old = np.ndarray.copy(d_new)  # save value for d
         count += 1
     adjust = np.asarray([g_new, d_new])
@@ -190,7 +162,6 @@ def int_eprior(sdat, g_hat, d_hat, precision):
     """
     g_star = []
     d_star = []
-    # r = len(sdat) ## remove this and use immediately len(sdat)
     # use this variable to only print error message once if approximation used
     test_approximation = 0
     for i in range(len(sdat)):
@@ -207,17 +178,6 @@ def int_eprior(sdat, g_hat, d_hat, precision):
         # /begin{handling high precision computing}
         temp_2d = 2*d
         if (precision == None):
-
-            # attempt to correct most warnings
-            # changes not applied as the approximation changes the results
-            # temp_sum2_temp_2d = sum2/(temp_2d)
-            # temp_sum2_temp_2d[temp_sum2_temp_2d > 700] = 700
-            # temp_power = 1/(np.pi*temp_2d)
-            # temp_power[temp_power>exp(700/(n/2))] = exp(700/(n/2))
-
-            # LH = np.power(temp_power,n/2)*np.exp(-temp_sum2_temp_2d)
-            # LH[temp_sum2_temp_2d == 700] = np.exp(-745)
-
             LH = np.power(1/(np.pi*temp_2d), n/2)*np.exp(np.negative(sum2)/(temp_2d))
 
         else:  # only if precision parameter informed
@@ -237,7 +197,6 @@ def int_eprior(sdat, g_hat, d_hat, precision):
         else:
             g_star.append(np.sum(g*LH)/np.sum(LH))
             d_star.append(np.sum(d*LH)/np.sum(LH))
-    # np.asarray just once --> not exactly the same
     adjust = np.asarray([np.asarray(g_star), np.asarray(d_star)])
     return(adjust)
 
@@ -263,8 +222,7 @@ def param_fun(i, s_data, batches, mean_only, gamma_hat, gamma_bar, delta_hat, t2
     if mean_only:  # if mean_only, no need for complex method: batch effect is immediately calculated
         t2_n = np.multiply(t2[i], 1)
         t2_n_g_hat = np.multiply(t2_n, gamma_hat[i])
-        # additive batch effect
-        gamma_star = postmean(gamma_bar[i], 1, t2_n, t2_n_g_hat)
+        gamma_star = postmean(gamma_bar[i], 1, t2_n, t2_n_g_hat)  # additive batch effect
         delta_star = [1]*len(s_data)  # multiplicative batch effect
     else:  # if not(mean_only) then use it_solve
         temp = it_sol(np.transpose(np.transpose(s_data)[
@@ -272,9 +230,6 @@ def param_fun(i, s_data, batches, mean_only, gamma_hat, gamma_bar, delta_hat, t2
         gamma_star = temp[0]  # additive batch effect
         delta_star = temp[1]  # multiplicative batch effect
     return [gamma_star, delta_star]
-
-# non-parametric estimation
-
 
 def nonparam_fun(i, mean_only, delta_hat, s_data, batches, gamma_hat, precision):
     """non-parametric estimation
@@ -341,12 +296,12 @@ def check_ref_batch(ref_batch, batch, batchmod):
         ref {int list} -- the corresponding positions of the reference batch in the batch list
         batchmod {matrix} -- updated model matrix related to batches, with reference
     """
-    if ref_batch:  # replace by "if ref_batch"
-        if ref_batch not in batch:  # "if ref_batch not in batch"
+    if ref_batch:
+        if ref_batch not in batch:
             print("Reference level ref.batch must be one of the levels of batch.")
             exit(0)
         print("Using batch "+str(ref_batch) +
-              " as a reference batch.")  # fstring ??
+              " as a reference batch.")
         # ref keeps in memory the columns concerned by the reference batch
         ref = np.where(np.unique(batch) == ref_batch)[0][0]
         # updates batchmod with reference
