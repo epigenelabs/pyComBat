@@ -34,6 +34,17 @@ You can find more detailed information in the LICENSE file.
 
 Installing pyComBat
 -------------------
+
+You have two possibilities to install and use pyComBat.
+
+You can download the utils.py script and then import the useful function:
+
+.. code-block:: Python
+
+    from utils import pycombat, export_pycombat
+
+We are currently working on making pyComBat usable as a Python library, which would be installed with:
+
 .. code-block:: Python
 
     pip install pyComBat
@@ -57,7 +68,7 @@ Contributing to pyComBat
 Contribution guidelines
 -----------------------
 
-Contribution guidelines can be found in CONTRIBUTING.md.
+Contribution guidelines can be found in `CONTRIBUTING.md <https://github.com/epigenelabs/pyComBat/blob/master/CONTRIBUTING.md>`_.
 
 Unit Testing
 ------------

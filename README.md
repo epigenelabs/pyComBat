@@ -1,6 +1,8 @@
 # pyComBat
 
-pyComBat is a Python 3 implementation of ComBat (1), one of the most widely used tool for correcting technical biases, called batch effects, in microarray expression data.
+pyComBat [1] is a Python 3 implementation of ComBat [2], one of the most widely used tool for correcting technical biases, called batch effects, in microarray expression data.
+
+More detailed documentation can be found at [this address](https://epigenelabs.github.io/pyComBat/).
 
 ## Minimum dependencies
 
@@ -25,9 +27,11 @@ We list here the versions of the paquages that have been used for development/te
 The simplest way of using pyComBat is to first import it, and simply use the pycombat function with default parameters:
 
 ```python
-import pycombat
+from utils import pycombat
 pycombat(data,batch)
 ```
+
+Note that you need to download the utils.py script and put it in the same folder as the rest of you code. We are currently working on making on making pyComBat usable as a Python library.
 
 * data: The expression matrix. It contains the information about the gene expression (rows) for each sample (columns). The first column (resp. row) is dedicated for the gene (resp. sample) names.
 
@@ -39,4 +43,6 @@ Please refer to [CONTRIBUTING.md](https://github.com/epigenelabs/pyComBat/blob/m
 
 ## References
 
-(1) Johnson,W.E. et al. (2007) Adjusting batch effects in microarray expression data using empirical Bayes methods. Biostatistics, 8, 118–127
+[1]
+
+[2] Johnson,W.E. et al. (2007) Adjusting batch effects in microarray expression data using empirical Bayes methods. Biostatistics, 8, 118–127
