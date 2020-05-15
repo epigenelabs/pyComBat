@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="pyComBat-test",
+    name="ComBat",
     version="0.1.2",
     author="Abdelkader Behdenna",
     author_email="abdelkader@epigenelabs.com",
