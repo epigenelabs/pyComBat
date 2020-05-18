@@ -41,13 +41,36 @@ You can download the utils.py script and then import the useful function:
 
 .. code-block:: Python
 
-    from utils import pycombat, export_pycombat
+    from pyComBat.utils import pycombat, export_pycombat
 
-We are currently working on making pyComBat usable as a Python library, which would be installed with:
+pyComBat is usable as a Python library, which is installed with:
 
 .. code-block:: Python
 
-    pip install pyComBat
+    pip install ComBat
+
+Using pyComBat
+--------------
+
+Minimal usage example:
+
+.. code-block:: Python
+
+    # prepare simulated data
+    matrix = np.transpose([np.random.normal(size=1000,loc=3,scale=1),np.random.normal(size=1000,loc=3,scale=1),np.random.normal(size=1000,loc=3,scale=1),
+                      np.random.normal(size=1000,loc=2,scale=0.6),np.random.normal(size=1000,loc=2,scale=0.6),
+                      np.random.normal(size=1000,loc=4,scale=1),np.random.normal(size=1000,loc=4,scale=1),np.random.normal(size=1000,loc=4,scale=1),np.random.normal(size=1000,loc=4,scale=1)])
+
+    df = pd.DataFrame(matrix,
+                 columns=["sample"+str(i) for i in range(9)],
+                 index=["gene"+str(i) for i in range(1000)])
+
+    batch = np.asarray([1,1,1,2,2,3,3,3,3])
+
+    # run pyComBat
+    df_corrected = pycombat(data,batch)
+
+
 
 Documentation for the code
 ==========================

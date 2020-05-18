@@ -615,11 +615,11 @@ def adjust_data(s_data, gamma_star, delta_star, batch_design, n_batches, var_poo
     return bayes_data
 
 
-def pycombat(dat, batch, mod=[], par_prior=True, prior_plots=False, mean_only=False, ref_batch=None, precision=None, **kwargs):
+def pycombat(data, batch, mod=[], par_prior=True, prior_plots=False, mean_only=False, ref_batch=None, precision=None, **kwargs):
     """Corrects batch effect in microarray expression data. Takes an gene expression file and a list of known batches corresponding to each sample.
 
     Arguments:
-        dat {matrix} -- The expression matrix. It contains the information about the gene expression (rows) for each sample (columns). The first column (resp. row) are reserved for the genes (resp. sample) names.
+        data {matrix} -- The expression matrix (dataframe). It contains the information about the gene expression (rows) for each sample (columns).
 
         batch {list} -- List of batch indexes. The batch list describes the batch for each sample. The batches list has as many elements as the number of columns in the expression matrix.
 
@@ -639,6 +639,11 @@ def pycombat(dat, batch, mod=[], par_prior=True, prior_plots=False, mean_only=Fa
     Returns:
         matrix -- The data table adjusted for batch effects. By default, pyComBat creates a numpy object containing a matrix, corresponding to the input expression matrix, corrected for batch effects. You can use the function export_pyComBat (described below) to export your results in different formats.
     """
+
+    list_samples = data.columns
+    list_genes = data.index
+    dat = data.values
+
     check_mean_only(mean_only)
 
     batchmod = define_batchmod(batch)
@@ -655,7 +660,12 @@ def pycombat(dat, batch, mod=[], par_prior=True, prior_plots=False, mean_only=Fa
         design, n_batch, s_data, batches, mean_only, par_prior, precision, ref_batch, ref, NAs)
     bayes_data = adjust_data(s_data, gamma_star, delta_star, batch_design,
                              n_batches, var_pooled, stand_mean, n_array, ref_batch, ref, batches, dat)
-    return(bayes_data)
+    
+    bayes_data_df = pd.DataFrame(bayes_data,
+                 columns = list_samples,
+                 index = list_genes)
+
+    return(bayes_data_df)
 
 
 def export_pycombat(bayes_data, sample_names, gene_names, name="result", format="pkl"):

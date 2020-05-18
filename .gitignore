@@ -71,4 +71,5 @@ rsconnect/
 # build files
 build/
 pyComBat_test.egg-info/
+ComBat.egg-info/
 dist/
