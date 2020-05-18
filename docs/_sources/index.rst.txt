@@ -51,7 +51,7 @@ Then, you can import the pycombat function:
 
 .. code-block:: Python
 
-    from ComBat.pycombat import pycombat
+    from combat.pycombat import pycombat
 
 Using pyComBat
 --------------
