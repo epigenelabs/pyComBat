@@ -90,10 +90,11 @@
 <li><a class="reference internal" href="#implementation">Implementation</a></li>
 <li><a class="reference internal" href="#license">License</a></li>
 <li><a class="reference internal" href="#installing-pycombat">Installing pyComBat</a></li>
+<li><a class="reference internal" href="#using-pycombat">Using pyComBat</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#documentation-for-the-code">Documentation for the code</a><ul>
-<li><a class="reference internal" href="#module-utils">pyComBat utils</a></li>
+<li><a class="reference internal" href="#module-pycombat">pyComBat utils</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#contributing-to-pycombat">Contributing to pyComBat</a><ul>
@@ -198,13 +199,44 @@ While the mathematical framework is strictly the same, pyComBat:</p>
 </div>
 <div class="section" id="installing-pycombat">
 <h2>Installing pyComBat<a class="headerlink" href="#installing-pycombat" title="Permalink to this headline">¶</a></h2>
-<p>You have two possibilities to install and use pyComBat.</p>
-<p>You can download the utils.py script and then import the useful function:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">pycombat</span><span class="p">,</span> <span class="n">export_pycombat</span>
+<p>pyComBat is usable as a Python package, which is installed with:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">ComBat</span>
 </pre></div>
 </div>
-<p>We are currently working on making pyComBat usable as a Python library, which would be installed with:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">pyComBat</span>
+<p>To upgrade the package to the latest version, please use:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">ComBat</span> <span class="o">--</span><span class="n">upgrade</span>
+</pre></div>
+</div>
+<p>Then, you can import the pycombat function:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ComBat.pycombat</span> <span class="kn">import</span> <span class="n">pycombat</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-pycombat">
+<h2>Using pyComBat<a class="headerlink" href="#using-pycombat" title="Permalink to this headline">¶</a></h2>
+<p>Minimal usage example:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">ComBat.pycombat</span> <span class="kn">import</span> <span class="n">pycombat</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="c1"># prepare simulated data</span>
+<span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">loc</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">loc</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">loc</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                  <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">loc</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mf">0.6</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">loc</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mf">0.6</span><span class="p">),</span>
+                  <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">loc</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">loc</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">loc</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">loc</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">)])</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span>
+             <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sample&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)],</span>
+             <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;gene&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)])</span>
+
+<span class="n">batch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+
+<span class="c1"># run pyComBat</span>
+<span class="n">df_corrected</span> <span class="o">=</span> <span class="n">pycombat</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">batch</span><span class="p">)</span>
+
+<span class="c1"># visualise results</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">df_corrected</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
 </pre></div>
 </div>
 </div>
@@ -213,14 +245,14 @@ While the mathematical framework is strictly the same, pyComBat:</p>
 <h1>Documentation for the code<a class="headerlink" href="#documentation-for-the-code" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<div class="section" id="module-utils">
-<span id="pycombat-utils"></span><h2>pyComBat utils<a class="headerlink" href="#module-utils" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-pycombat">
+<span id="pycombat-utils"></span><h2>pyComBat utils<a class="headerlink" href="#module-pycombat" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="utils.pycombat">
-<code class="sig-prename descclassname">utils.</code><code class="sig-name descname">pycombat</code><span class="sig-paren">(</span><em class="sig-param">dat</em>, <em class="sig-param">batch</em>, <em class="sig-param">mod=[]</em>, <em class="sig-param">par_prior=True</em>, <em class="sig-param">prior_plots=False</em>, <em class="sig-param">mean_only=False</em>, <em class="sig-param">ref_batch=None</em>, <em class="sig-param">precision=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils.html#pycombat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utils.pycombat" title="Permalink to this definition">¶</a></dt>
+<dt id="pycombat.pycombat">
+<code class="sig-prename descclassname">pycombat.</code><code class="sig-name descname">pycombat</code><span class="sig-paren">(</span><em class="sig-param">data</em>, <em class="sig-param">batch</em>, <em class="sig-param">mod=[]</em>, <em class="sig-param">par_prior=True</em>, <em class="sig-param">prior_plots=False</em>, <em class="sig-param">mean_only=False</em>, <em class="sig-param">ref_batch=None</em>, <em class="sig-param">precision=None</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pycombat.html#pycombat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pycombat.pycombat" title="Permalink to this definition">¶</a></dt>
 <dd><p>Corrects batch effect in microarray expression data. Takes an gene expression file and a list of known batches corresponding to each sample.</p>
 <dl>
-<dt>Arguments:</dt><dd><p>dat {matrix} – The expression matrix. It contains the information about the gene expression (rows) for each sample (columns). The first column (resp. row) are reserved for the genes (resp. sample) names.</p>
+<dt>Arguments:</dt><dd><p>data {matrix} – The expression matrix (dataframe). It contains the information about the gene expression (rows) for each sample (columns).</p>
 <p>batch {list} – List of batch indexes. The batch list describes the batch for each sample. The batches list has as many elements as the number of columns in the expression matrix.</p>
 </dd>
 <dt>Keyword Arguments:</dt><dd><p>mod {list} – list of mods (default: {[]})</p>
@@ -230,22 +262,7 @@ While the mathematical framework is strictly the same, pyComBat:</p>
 <p>ref_batch {int} – reference batch selected (default: {None})</p>
 <p>precision {float} – level of precision for precision computing (default: {None})</p>
 </dd>
-<dt>Returns:</dt><dd><p>matrix – The data table adjusted for batch effects. By default, pyComBat creates a numpy object containing a matrix, corresponding to the input expression matrix, corrected for batch effects. You can use the function export_pyComBat (described below) to export your results in different formats.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="function">
-<dt id="utils.export_pycombat">
-<code class="sig-prename descclassname">utils.</code><code class="sig-name descname">export_pycombat</code><span class="sig-paren">(</span><em class="sig-param">bayes_data</em>, <em class="sig-param">sample_names</em>, <em class="sig-param">gene_names</em>, <em class="sig-param">name='result'</em>, <em class="sig-param">format='pkl'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utils.html#export_pycombat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utils.export_pycombat" title="Permalink to this definition">¶</a></dt>
-<dd><p>Exports an expression matrix corrected for batch effects in a pickle or csv file</p>
-<dl>
-<dt>Arguments:</dt><dd><p>bayes_data {matrix} – a (corrected) expression matrix</p>
-<p>sample_names {list} – a list of sample_names, len(sample_names) == ncol(bayes_data)</p>
-<p>gene_names {list} – a list of gene_names, len(gene_names) == nrow(bayes_data)</p>
-</dd>
-<dt>Keyword Arguments:</dt><dd><p>name {str} – name of the export file (default: {“result”})</p>
-<p>format {str} – format of the export file. If csv, exports a csv file, else a pkl (default: {“pkl”})</p>
+<dt>Returns:</dt><dd><p>bayes_data_df – The expression dataframe adjusted for batch effects.</p>
 </dd>
 </dl>
 </dd></dl>

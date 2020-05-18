@@ -35,19 +35,23 @@ You can find more detailed information in the LICENSE file.
 Installing pyComBat
 -------------------
 
-You have two possibilities to install and use pyComBat.
-
-You can download the utils.py script and then import the useful function:
-
-.. code-block:: Python
-
-    from pyComBat.utils import pycombat, export_pycombat
-
-pyComBat is usable as a Python library, which is installed with:
+pyComBat is usable as a Python package, which is installed with:
 
 .. code-block:: Python
 
     pip install ComBat
+
+To upgrade the package to the latest version, please use:
+
+.. code-block:: Python
+
+    pip install ComBat --upgrade
+
+Then, you can import the pycombat function:
+
+.. code-block:: Python
+
+    from ComBat.pycombat import pycombat
 
 Using pyComBat
 --------------
@@ -55,6 +59,10 @@ Using pyComBat
 Minimal usage example:
 
 .. code-block:: Python
+
+    from ComBat.pycombat import pycombat
+    import numpy as np
+    import pandas as pd
 
     # prepare simulated data
     matrix = np.transpose([np.random.normal(size=1000,loc=3,scale=1),np.random.normal(size=1000,loc=3,scale=1),np.random.normal(size=1000,loc=3,scale=1),
@@ -70,6 +78,11 @@ Minimal usage example:
     # run pyComBat
     df_corrected = pycombat(data,batch)
 
+    # visualise results
+    import matplotlib.pyplot as plt
+    plt.boxplot(df.transpose())
+    plt.boxplot(df_corrected.transpose())
+
 
 
 Documentation for the code
@@ -81,8 +94,8 @@ Documentation for the code
 
 pyComBat utils
 --------------
-.. automodule:: utils
-    :members: pycombat, export_pycombat
+.. automodule:: pycombat
+    :members: pycombat
 
 
 Contributing to pyComBat

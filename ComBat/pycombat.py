@@ -637,7 +637,7 @@ def pycombat(data, batch, mod=[], par_prior=True, prior_plots=False, mean_only=F
         precision {float} -- level of precision for precision computing (default: {None})
 
     Returns:
-        matrix -- The data table adjusted for batch effects. By default, pyComBat creates a numpy object containing a matrix, corresponding to the input expression matrix, corrected for batch effects. You can use the function export_pyComBat (described below) to export your results in different formats.
+        bayes_data_df -- The expression dataframe adjusted for batch effects.
     """
 
     list_samples = data.columns
@@ -666,26 +666,3 @@ def pycombat(data, batch, mod=[], par_prior=True, prior_plots=False, mean_only=F
                  index = list_genes)
 
     return(bayes_data_df)
-
-
-def export_pycombat(bayes_data, sample_names, gene_names, name="result", format="pkl"):
-    """Exports an expression matrix corrected for batch effects in a pickle or csv file
-
-    Arguments:
-        bayes_data {matrix} -- a (corrected) expression matrix
-
-        sample_names {list} -- a list of sample_names, len(sample_names) == ncol(bayes_data)
-
-        gene_names {list} -- a list of gene_names, len(gene_names) == nrow(bayes_data)
-
-    Keyword Arguments:
-        name {str} -- name of the export file (default: {"result"})
-
-        format {str} -- format of the export file. If csv, exports a csv file, else a pkl (default: {"pkl"})
-    """
-    results_df = pd.DataFrame(
-        bayes_data, columns=sample_names, index=gene_names)
-    if format == "csv":
-        results_df.to_csv(name + '.csv')
-    else:
-        results_df.to_pickle(name + '.pkl')

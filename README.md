@@ -32,16 +32,22 @@ You can install pyComBat directly with:
 pip install ComBat
 ```
 
-### Running pyComBat
-
-The simplest way of using pyComBat is to first import it, and simply use the pycombat function with default parameters:
+You can upgrade pyComBat to its latest version with:
 
 ```python
-from pyComBat.utils import *
+pip install ComBat --upgrade
+```
+
+### Running pyComBat
+
+The simplest way of using pyComBat is to first import it, and then simply use the pycombat function with default parameters:
+
+```python
+from ComBat.pycombat import pycombat
 data_corrected = pycombat(data,batch)
 ```
 
-* data: The expression matrix. It contains the information about the gene expression (rows) for each sample (columns). The first column (resp. row) is dedicated for the gene (resp. sample) names.
+* data: The expression matrix as a dataframe. It contains the information about the gene expression (rows) for each sample (columns).
 
 * batch: List of batch indexes. The batch list describes the batch for each sample. The list of batches contains as many elements as the number of columns in the expression matrix.
 
