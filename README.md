@@ -29,13 +29,13 @@ We list here the versions of the packages that have been used for development/te
 You can install pyComBat directly with:
 
 ```python
-pip install ComBat
+pip install combat
 ```
 
 You can upgrade pyComBat to its latest version with:
 
 ```python
-pip install ComBat --upgrade
+pip install combat --upgrade
 ```
 
 ### Running pyComBat
@@ -43,7 +43,7 @@ pip install ComBat --upgrade
 The simplest way of using pyComBat is to first import it, and then simply use the pycombat function with default parameters:
 
 ```python
-from ComBat.pycombat import pycombat
+from combat.pycombat import pycombat
 data_corrected = pycombat(data,batch)
 ```
 

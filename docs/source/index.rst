@@ -39,13 +39,13 @@ pyComBat is usable as a Python package, which is installed with:
 
 .. code-block:: Python
 
-    pip install ComBat
+    pip install combat
 
 To upgrade the package to the latest version, please use:
 
 .. code-block:: Python
 
-    pip install ComBat --upgrade
+    pip install combat --upgrade
 
 Then, you can import the pycombat function:
 
@@ -60,7 +60,7 @@ Minimal usage example:
 
 .. code-block:: Python
 
-    from ComBat.pycombat import pycombat
+    from combat.pycombat import pycombat
     import numpy as np
     import pandas as pd
 
@@ -76,7 +76,7 @@ Minimal usage example:
     batch = np.asarray([1,1,1,2,2,3,3,3,3])
 
     # run pyComBat
-    df_corrected = pycombat(data,batch)
+    df_corrected = pycombat(df,batch)
 
     # visualise results
     import matplotlib.pyplot as plt

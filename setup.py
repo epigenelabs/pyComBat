@@ -4,8 +4,8 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="ComBat",
-    version="0.1.4",
+    name="combat",
+    version="0.1.5",
     author="Abdelkader Behdenna",
     author_email="abdelkader@epigenelabs.com",
     description="pyComBat, a Python tool for batch effects correction in high-throughput molecular data using empirical Bayes methods",
