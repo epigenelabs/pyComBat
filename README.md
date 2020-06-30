@@ -4,11 +4,17 @@ pyComBat [1] is a Python 3 implementation of ComBat [2], one of the most widely 
 
 More detailed documentation can be found at [this address](https://epigenelabs.github.io/pyComBat/).
 
+## TO DO
+
+- [ ] Benchmark with scanpy
+- [ ] Add imputation of missing values
+- [ ] Add unit testing on covariates and model matrix
+
 ## Minimum dependencies
 
 We list here the versions of the packages that have been used for development/testing of pyComBat, as well as for writing the documentation.
 
-### pyCombat dependencies
+### pyComBat dependencies
 
 * python 3.6
 
