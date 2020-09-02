@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------------
-# Copyright (C) 2019-2020 A Behdenna, A Nordor, J. Haziza and A. Gema
+# Copyright (C) 2019-2020 A. Behdenna, A. Nordor, J. Haziza and A. Gema
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,9 +16,9 @@
 
 # For more information, please contact Abdelkader Behdenna <abdelkader@epigenelabs.com>/<kaderbehdenna@gmail.com>
 
-# file 	utils.py
+# file 	pycombat.py
 # author A. Behdenna, J. Haziza, A. Gema, A. Nordor
-# date 	Mar 2020 
+# date 	Sept 2020 
 #-----------------------------------------------------------------------------
 
 
@@ -30,7 +30,7 @@ from functools import partial
 import mpmath as mp
 import pandas as pd
 
-import unittest
+#import unittest
 
 
 def model_matrix(batch):
@@ -42,8 +42,9 @@ def model_matrix(batch):
     Returns:
         matrix -- model matrix generate from batch list
     """
-    list_elts_batch = list(
-        set(batch))
+    # list_elts_batch = list(
+    #     set(batch))
+    list_elts_batch = sorted(list(set(batch)))
     n = len(batch)
     n_batch = len(list_elts_batch)
     dict_batch = {}
@@ -379,7 +380,7 @@ def treat_covariates(batchmod, mod, ref, n_batch):
         mod  # general matrix containing the information about the different covariates (batch included)
     # design matrix for sample conditions
     check = list(map(all_1, design))
-    if ref:  # if ref
+    if ref is not None:  # if ref
         check[ref] = False  # the reference in not considered as a covariate
     design = np.asarray(design)
     design = design[[not el for el in check]]
@@ -420,7 +421,7 @@ def check_NAs(dat):
     return(NAs)
 
 
-def calculate_mean_var(design, batches, ref, dat, NAs, ref_batch, n_batches, n_array):
+def calculate_mean_var(design, batches, ref, dat, NAs, ref_batch, n_batches, n_batch, n_array):
     """ calculates the Normalisation factors
 
     Arguments:
@@ -444,14 +445,14 @@ def calculate_mean_var(design, batches, ref, dat, NAs, ref_batch, n_batches, n_a
             design)), np.dot(design, np.transpose(dat)))
 
     # Calculates the general mean
-    if ref_batch:
+    if ref_batch is not None:
         grand_mean = np.transpose(B_hat[ref])
     else:
         grand_mean = np.dot(np.transpose(
-            [i / n_array for i in n_batches]), B_hat)
+            [i / n_array for i in n_batches]), B_hat[0:n_batch])
     # Calculates the general variance
     if not NAs:  # NAs not supported
-        if ref_batch:  # depending on ref batch
+        if ref_batch is not None:  # depending on ref batch
             ref_dat = np.transpose(np.transpose(dat)[batches[ref]])
             var_pooled = np.dot(np.square(ref_dat - np.transpose(np.dot(np.transpose(
                 design)[batches[ref]], B_hat))), [1/n_batches[ref]]*n_batches[ref])
@@ -624,7 +625,7 @@ def pycombat(data, batch, mod=[], par_prior=True, prior_plots=False, mean_only=F
         batch {list} -- List of batch indexes. The batch list describes the batch for each sample. The batches list has as many elements as the number of columns in the expression matrix.
 
     Keyword Arguments:
-        mod {list} -- list of mods (default: {[]})
+        mod {list} -- Model matrix for covariates description (default: {[]})
 
         par_prior {bool} -- False for non-parametric estimation of batch effects (default: {True})
 
@@ -652,7 +653,7 @@ def pycombat(data, batch, mod=[], par_prior=True, prior_plots=False, mean_only=F
     design = treat_covariates(batchmod, mod, ref, n_batch)
     NAs = check_NAs(dat)
     B_hat, grand_mean, var_pooled = calculate_mean_var(
-        design, batches, ref, dat, NAs, ref_batch, n_batches, n_array)
+        design, batches, ref, dat, NAs, ref_batch, n_batches, n_batch, n_array)
     stand_mean = calculate_stand_mean(
         grand_mean, n_array, design, n_batch, B_hat)
     s_data = standardise_data(dat, stand_mean, var_pooled, n_array)

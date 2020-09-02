@@ -55,6 +55,8 @@ rsconnect/
 *.pdf
 !pyComBat_manual.pdf
 
+misc/
+
 .coverage
 
 # latex files

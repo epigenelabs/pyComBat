@@ -41,7 +41,7 @@ Again, all actions should go through the pull request process!
 
 A unit testing framework (under development) is ready in the form of the script `test_unit.py`. Simply run it by using `pytest` directly in the terminal.
 
-You can install pytest by running the followinfg command in your command line:
+You can install pytest by running the following command in your command line:
 
 ```python
 pip install -U pytest
