@@ -23,7 +23,7 @@ If you want to implement a new interesting feature, please start by posting abou
 Please start by searching amongst the issues list if the bug has already been signaled, and post about it if not.
 Vigilante is very much appreciated, help us to spot if any issues is a duplicate. If you have any question, don't hesitate to contact us.
 
-*PLEASE USE PULL REQUEST IF YOU WANT TO CONTRIBUTE.*
+*PLEASE USE PULL REQUEST IF YOU WANT TO CONTRIBUTE.* Also, please update the changelog!
 
 ### Testing pyComBat on new datasets
 
