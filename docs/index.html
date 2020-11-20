@@ -90,7 +90,10 @@
 <li><a class="reference internal" href="#implementation">Implementation</a></li>
 <li><a class="reference internal" href="#license">License</a></li>
 <li><a class="reference internal" href="#installing-pycombat">Installing pyComBat</a></li>
-<li><a class="reference internal" href="#using-pycombat">Using pyComBat</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-pycombat">Using pyComBat</a><ul>
+<li><a class="reference internal" href="#minimal-usage-example">Minimal usage example</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#documentation-for-the-code">Documentation for the code</a><ul>
@@ -212,33 +215,49 @@ While the mathematical framework is strictly the same, pyComBat:</p>
 </pre></div>
 </div>
 </div>
+</div>
 <div class="section" id="using-pycombat">
-<h2>Using pyComBat<a class="headerlink" href="#using-pycombat" title="Permalink to this headline">¶</a></h2>
-<p>Minimal usage example:</p>
-<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">combat.pycombat</span> <span class="kn">import</span> <span class="n">pycombat</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<h1>Using pyComBat<a class="headerlink" href="#using-pycombat" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="minimal-usage-example">
+<h2>Minimal usage example<a class="headerlink" href="#minimal-usage-example" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># import libraries</span>
+<span class="kn">from</span> <span class="nn">combat.pycombat</span> <span class="kn">import</span> <span class="n">pycombat</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-
-<span class="c1"># prepare simulated data</span>
-<span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">loc</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">loc</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">loc</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
-                  <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">loc</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mf">0.6</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">loc</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mf">0.6</span><span class="p">),</span>
-                  <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">loc</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">loc</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">loc</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span><span class="n">loc</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="n">scale</span><span class="o">=</span><span class="mi">1</span><span class="p">)])</span>
-
-<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span>
-             <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sample&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">)],</span>
-             <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;gene&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">)])</span>
-
-<span class="n">batch</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
-
-<span class="c1"># run pyComBat</span>
-<span class="n">df_corrected</span> <span class="o">=</span> <span class="n">pycombat</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">batch</span><span class="p">)</span>
-
-<span class="c1"># visualise results</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">df_corrected</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
+
+<span class="c1"># prepare data</span>
+<span class="c1"># the datasets are dataframes where:</span>
+    <span class="c1"># the indexes correspond to the gene names</span>
+    <span class="c1"># the columns names correspond to the samples names</span>
+<span class="c1"># Any number (&gt;=2) of datasets can be treated</span>
+<span class="n">dataset_1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="s2">&quot;dataset_1.pickle&quot;</span><span class="p">)</span> <span class="c1"># datasets can also be stored in csv, tsv, etc files</span>
+<span class="n">dataset_2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="s2">&quot;dataset_2.pickle&quot;</span><span class="p">)</span>
+<span class="n">dataset_3</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="s2">&quot;dataset_3.pickle&quot;</span><span class="p">)</span>
+<span class="n">datasets</span> <span class="o">=</span> <span class="p">[</span><span class="n">dataset_1</span><span class="p">,</span><span class="n">dataset_2</span><span class="p">,</span><span class="n">dataset3</span><span class="p">]</span>
+
+<span class="c1"># we merge all the datasets into one, by keeping the common genes only</span>
+<span class="n">df_expression</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">datasets</span><span class="p">,</span><span class="n">join</span><span class="o">=</span><span class="s2">&quot;inner&quot;</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># plot raw data</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">df_expression</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
+<a class="reference internal image-reference" href="_images/raw_data.png"><img alt="Alternative text" src="_images/raw_data.png" style="width: 400px;" /></a>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># we generate the list of batches</span>
+<span class="n">batch</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">datasets</span><span class="p">)):</span>
+    <span class="n">batch</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">j</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">datasets</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="p">))])</span>
+
+<span class="c1">#run pyComBat</span>
+<span class="n">df_corrected</span> <span class="o">=</span> <span class="n">pycombat</span><span class="p">(</span><span class="n">df_expression</span><span class="p">,</span><span class="n">batch</span><span class="p">)</span>
+
+<span class="c1"># visualise results</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">df_corrected</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<a class="reference internal image-reference" href="_images/corrected_data.png"><img alt="Alternative text" src="_images/corrected_data.png" style="width: 400px;" /></a>
 </div>
 </div>
 <div class="section" id="documentation-for-the-code">
@@ -255,7 +274,7 @@ While the mathematical framework is strictly the same, pyComBat:</p>
 <dt>Arguments:</dt><dd><p>data {matrix} – The expression matrix (dataframe). It contains the information about the gene expression (rows) for each sample (columns).</p>
 <p>batch {list} – List of batch indexes. The batch list describes the batch for each sample. The batches list has as many elements as the number of columns in the expression matrix.</p>
 </dd>
-<dt>Keyword Arguments:</dt><dd><p>mod {list} – list of mods (default: {[]})</p>
+<dt>Keyword Arguments:</dt><dd><p>mod {list} – Model matrix for covariates description (default: {[]})</p>
 <p>par_prior {bool} – False for non-parametric estimation of batch effects (default: {True})</p>
 <p>prior_plots {bool} – True if requires to plot the priors (default: {False} – Not implemented yet!)</p>
 <p>mean_only {bool} – True iff just adjusting the means and not individual batch effects (default: {False})</p>

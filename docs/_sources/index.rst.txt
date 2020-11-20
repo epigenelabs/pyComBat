@@ -54,36 +54,56 @@ Then, you can import the pycombat function:
     from combat.pycombat import pycombat
 
 Using pyComBat
---------------
+==============
 
-Minimal usage example:
+Minimal usage example
+---------------------
 
 .. code-block:: Python
 
+    # import libraries
     from combat.pycombat import pycombat
-    import numpy as np
     import pandas as pd
+    import matplotlib.pyplot as plt
 
-    # prepare simulated data
-    matrix = np.transpose([np.random.normal(size=1000,loc=3,scale=1),np.random.normal(size=1000,loc=3,scale=1),np.random.normal(size=1000,loc=3,scale=1),
-                      np.random.normal(size=1000,loc=2,scale=0.6),np.random.normal(size=1000,loc=2,scale=0.6),
-                      np.random.normal(size=1000,loc=4,scale=1),np.random.normal(size=1000,loc=4,scale=1),np.random.normal(size=1000,loc=4,scale=1),np.random.normal(size=1000,loc=4,scale=1)])
+    # prepare data
+    # the datasets are dataframes where:
+        # the indexes correspond to the gene names
+        # the columns names correspond to the samples names
+    # Any number (>=2) of datasets can be treated
+    dataset_1 = pd.read_pickle("dataset_1.pickle") # datasets can also be stored in csv, tsv, etc files
+    dataset_2 = pd.read_pickle("dataset_2.pickle")
+    dataset_3 = pd.read_pickle("dataset_3.pickle")
+    datasets = [dataset_1,dataset_2,dataset3]
 
-    df = pd.DataFrame(matrix,
-                 columns=["sample"+str(i) for i in range(9)],
-                 index=["gene"+str(i) for i in range(1000)])
+    # we merge all the datasets into one, by keeping the common genes only
+    df_expression = pd.concat(datasets,join="inner",axis=1)
 
-    batch = np.asarray([1,1,1,2,2,3,3,3,3])
+    # plot raw data
+    plt.boxplot(df_expression.transpose())
+    plt.show()
 
-    # run pyComBat
-    df_corrected = pycombat(df,batch)
+.. image:: raw_data.png
+  :width: 400
+  :alt: Alternative text
+
+.. code-block:: Python
+
+    # we generate the list of batches
+    batch = []
+    for j in range(len(datasets)):    
+        batch.extend([j for i in range(len(datasets[j].columns))])
+
+    #run pyComBat
+    df_corrected = pycombat(df_expression,batch)
 
     # visualise results
-    import matplotlib.pyplot as plt
-    plt.boxplot(df.transpose())
     plt.boxplot(df_corrected.transpose())
+    plt.show()
 
-
+.. image:: corrected_data.png
+  :width: 400
+  :alt: Alternative text
 
 Documentation for the code
 ==========================

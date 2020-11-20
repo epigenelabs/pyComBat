@@ -147,7 +147,7 @@
             
   <h1>Source code for pycombat</h1><div class="highlight"><pre>
 <span></span><span class="c1">#-----------------------------------------------------------------------------</span>
-<span class="c1"># Copyright (C) 2019-2020 A Behdenna, A Nordor, J. Haziza and A. Gema</span>
+<span class="c1"># Copyright (C) 2019-2020 A. Behdenna, A. Nordor, J. Haziza and A. Gema</span>
 
 <span class="c1"># This program is free software: you can redistribute it and/or modify</span>
 <span class="c1"># it under the terms of the GNU General Public License as published by</span>
@@ -164,9 +164,9 @@
 
 <span class="c1"># For more information, please contact Abdelkader Behdenna &lt;abdelkader@epigenelabs.com&gt;/&lt;kaderbehdenna@gmail.com&gt;</span>
 
-<span class="c1"># file 	utils.py</span>
+<span class="c1"># file 	pycombat.py</span>
 <span class="c1"># author A. Behdenna, J. Haziza, A. Gema, A. Nordor</span>
-<span class="c1"># date 	Mar 2020 </span>
+<span class="c1"># date 	Sept 2020 </span>
 <span class="c1">#-----------------------------------------------------------------------------</span>
 
 
@@ -178,7 +178,7 @@
 <span class="kn">import</span> <span class="nn">mpmath</span> <span class="k">as</span> <span class="nn">mp</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="c1">#import unittest</span>
 
 
 <span class="k">def</span> <span class="nf">model_matrix</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
@@ -190,8 +190,9 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        matrix -- model matrix generate from batch list</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">list_elts_batch</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
-        <span class="nb">set</span><span class="p">(</span><span class="n">batch</span><span class="p">))</span>
+    <span class="c1"># list_elts_batch = list(</span>
+    <span class="c1">#     set(batch))</span>
+    <span class="n">list_elts_batch</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">batch</span><span class="p">)))</span>
     <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
     <span class="n">n_batch</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_elts_batch</span><span class="p">)</span>
     <span class="n">dict_batch</span> <span class="o">=</span> <span class="p">{}</span>
@@ -527,7 +528,7 @@
         <span class="n">mod</span>  <span class="c1"># general matrix containing the information about the different covariates (batch included)</span>
     <span class="c1"># design matrix for sample conditions</span>
     <span class="n">check</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">all_1</span><span class="p">,</span> <span class="n">design</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">ref</span><span class="p">:</span>  <span class="c1"># if ref</span>
+    <span class="k">if</span> <span class="n">ref</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># if ref</span>
         <span class="n">check</span><span class="p">[</span><span class="n">ref</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># the reference in not considered as a covariate</span>
     <span class="n">design</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">design</span><span class="p">)</span>
     <span class="n">design</span> <span class="o">=</span> <span class="n">design</span><span class="p">[[</span><span class="ow">not</span> <span class="n">el</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">check</span><span class="p">]]</span>
@@ -568,7 +569,7 @@
     <span class="k">return</span><span class="p">(</span><span class="n">NAs</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">calculate_mean_var</span><span class="p">(</span><span class="n">design</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">NAs</span><span class="p">,</span> <span class="n">ref_batch</span><span class="p">,</span> <span class="n">n_batches</span><span class="p">,</span> <span class="n">n_array</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">calculate_mean_var</span><span class="p">(</span><span class="n">design</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">NAs</span><span class="p">,</span> <span class="n">ref_batch</span><span class="p">,</span> <span class="n">n_batches</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">,</span> <span class="n">n_array</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; calculates the Normalisation factors</span>
 
 <span class="sd">    Arguments:</span>
@@ -592,14 +593,14 @@
             <span class="n">design</span><span class="p">)),</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">design</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">dat</span><span class="p">)))</span>
 
     <span class="c1"># Calculates the general mean</span>
-    <span class="k">if</span> <span class="n">ref_batch</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">ref_batch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">grand_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">B_hat</span><span class="p">[</span><span class="n">ref</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">grand_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">i</span> <span class="o">/</span> <span class="n">n_array</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">n_batches</span><span class="p">]),</span> <span class="n">B_hat</span><span class="p">)</span>
+            <span class="p">[</span><span class="n">i</span> <span class="o">/</span> <span class="n">n_array</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">n_batches</span><span class="p">]),</span> <span class="n">B_hat</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">n_batch</span><span class="p">])</span>
     <span class="c1"># Calculates the general variance</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">NAs</span><span class="p">:</span>  <span class="c1"># NAs not supported</span>
-        <span class="k">if</span> <span class="n">ref_batch</span><span class="p">:</span>  <span class="c1"># depending on ref batch</span>
+        <span class="k">if</span> <span class="n">ref_batch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># depending on ref batch</span>
             <span class="n">ref_dat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">dat</span><span class="p">)[</span><span class="n">batches</span><span class="p">[</span><span class="n">ref</span><span class="p">]])</span>
             <span class="n">var_pooled</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">ref_dat</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span>
                 <span class="n">design</span><span class="p">)[</span><span class="n">batches</span><span class="p">[</span><span class="n">ref</span><span class="p">]],</span> <span class="n">B_hat</span><span class="p">))),</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">n_batches</span><span class="p">[</span><span class="n">ref</span><span class="p">]]</span><span class="o">*</span><span class="n">n_batches</span><span class="p">[</span><span class="n">ref</span><span class="p">])</span>
@@ -772,7 +773,7 @@
 <span class="sd">        batch {list} -- List of batch indexes. The batch list describes the batch for each sample. The batches list has as many elements as the number of columns in the expression matrix.</span>
 
 <span class="sd">    Keyword Arguments:</span>
-<span class="sd">        mod {list} -- list of mods (default: {[]})</span>
+<span class="sd">        mod {list} -- Model matrix for covariates description (default: {[]})</span>
 
 <span class="sd">        par_prior {bool} -- False for non-parametric estimation of batch effects (default: {True})</span>
 
@@ -800,7 +801,7 @@
     <span class="n">design</span> <span class="o">=</span> <span class="n">treat_covariates</span><span class="p">(</span><span class="n">batchmod</span><span class="p">,</span> <span class="n">mod</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">)</span>
     <span class="n">NAs</span> <span class="o">=</span> <span class="n">check_NAs</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
     <span class="n">B_hat</span><span class="p">,</span> <span class="n">grand_mean</span><span class="p">,</span> <span class="n">var_pooled</span> <span class="o">=</span> <span class="n">calculate_mean_var</span><span class="p">(</span>
-        <span class="n">design</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">NAs</span><span class="p">,</span> <span class="n">ref_batch</span><span class="p">,</span> <span class="n">n_batches</span><span class="p">,</span> <span class="n">n_array</span><span class="p">)</span>
+        <span class="n">design</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">NAs</span><span class="p">,</span> <span class="n">ref_batch</span><span class="p">,</span> <span class="n">n_batches</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">,</span> <span class="n">n_array</span><span class="p">)</span>
     <span class="n">stand_mean</span> <span class="o">=</span> <span class="n">calculate_stand_mean</span><span class="p">(</span>
         <span class="n">grand_mean</span><span class="p">,</span> <span class="n">n_array</span><span class="p">,</span> <span class="n">design</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">,</span> <span class="n">B_hat</span><span class="p">)</span>
     <span class="n">s_data</span> <span class="o">=</span> <span class="n">standardise_data</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">stand_mean</span><span class="p">,</span> <span class="n">var_pooled</span><span class="p">,</span> <span class="n">n_array</span><span class="p">)</span>
