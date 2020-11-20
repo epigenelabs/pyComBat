@@ -94,6 +94,7 @@
 </li>
 <li><a class="reference internal" href="#using-pycombat">Using pyComBat</a><ul>
 <li><a class="reference internal" href="#minimal-usage-example">Minimal usage example</a></li>
+<li><a class="reference internal" href="#biological-insight">Biological Insight</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#documentation-for-the-code">Documentation for the code</a><ul>
@@ -220,6 +221,7 @@ While the mathematical framework is strictly the same, pyComBat:</p>
 <h1>Using pyComBat<a class="headerlink" href="#using-pycombat" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="minimal-usage-example">
 <h2>Minimal usage example<a class="headerlink" href="#minimal-usage-example" title="Permalink to this headline">¶</a></h2>
+<p>This minimal usage example illustrates how to use pyComBat in a default setting, and shows some results on ovarian cancer data, freely available on NCBI’s <a class="reference external" href="https://www.ncbi.nlm.nih.gov/geo/">Gene Expression Omnibus</a>.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># import libraries</span>
 <span class="kn">from</span> <span class="nn">combat.pycombat</span> <span class="kn">import</span> <span class="n">pycombat</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -228,28 +230,26 @@ While the mathematical framework is strictly the same, pyComBat:</p>
 <span class="c1"># prepare data</span>
 <span class="c1"># the datasets are dataframes where:</span>
     <span class="c1"># the indexes correspond to the gene names</span>
-    <span class="c1"># the columns names correspond to the samples names</span>
+    <span class="c1"># the column names correspond to the sample names</span>
 <span class="c1"># Any number (&gt;=2) of datasets can be treated</span>
 <span class="n">dataset_1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="s2">&quot;dataset_1.pickle&quot;</span><span class="p">)</span> <span class="c1"># datasets can also be stored in csv, tsv, etc files</span>
 <span class="n">dataset_2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="s2">&quot;dataset_2.pickle&quot;</span><span class="p">)</span>
 <span class="n">dataset_3</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="s2">&quot;dataset_3.pickle&quot;</span><span class="p">)</span>
-<span class="n">datasets</span> <span class="o">=</span> <span class="p">[</span><span class="n">dataset_1</span><span class="p">,</span><span class="n">dataset_2</span><span class="p">,</span><span class="n">dataset3</span><span class="p">]</span>
 
 <span class="c1"># we merge all the datasets into one, by keeping the common genes only</span>
-<span class="n">df_expression</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">datasets</span><span class="p">,</span><span class="n">join</span><span class="o">=</span><span class="s2">&quot;inner&quot;</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">df_expression</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">dataset_1</span><span class="p">,</span><span class="n">dataset_2</span><span class="p">,</span><span class="n">dataset3</span><span class="p">],</span><span class="n">join</span><span class="o">=</span><span class="s2">&quot;inner&quot;</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="c1"># plot raw data</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">df_expression</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="_images/raw_data.png"><img alt="Alternative text" src="_images/raw_data.png" style="width: 400px;" /></a>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># we generate the list of batches</span>
 <span class="n">batch</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">datasets</span><span class="p">)):</span>
-    <span class="n">batch</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">j</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">datasets</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="p">))])</span>
+    <span class="n">batch</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">j</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">datasets</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="p">))])</span>
 
-<span class="c1">#run pyComBat</span>
+<span class="c1"># run pyComBat</span>
 <span class="n">df_corrected</span> <span class="o">=</span> <span class="n">pycombat</span><span class="p">(</span><span class="n">df_expression</span><span class="p">,</span><span class="n">batch</span><span class="p">)</span>
 
 <span class="c1"># visualise results</span>
@@ -257,7 +257,11 @@ While the mathematical framework is strictly the same, pyComBat:</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
-<a class="reference internal image-reference" href="_images/corrected_data.png"><img alt="Alternative text" src="_images/corrected_data.png" style="width: 400px;" /></a>
+</div>
+<div class="section" id="biological-insight">
+<h2>Biological Insight<a class="headerlink" href="#biological-insight" title="Permalink to this headline">¶</a></h2>
+<p>The data we used for the usage example contain tumor samples and normal samples. A simple PCA on the raw expression data shows that, instead of grouping by sample type, the data are clustered by dataset.</p>
+<p>However, after corrected for batch effects with pyComBat, the same PCA now shows two clusters, respectively with tumor and normal samples.</p>
 </div>
 </div>
 <div class="section" id="documentation-for-the-code">

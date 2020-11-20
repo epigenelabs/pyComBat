@@ -59,6 +59,8 @@ Using pyComBat
 Minimal usage example
 ---------------------
 
+This minimal usage example illustrates how to use pyComBat in a default setting, and shows some results on ovarian cancer data, freely available on NCBI's `Gene Expression Omnibus <https://www.ncbi.nlm.nih.gov/geo/>`_.
+
 .. code-block:: Python
 
     # import libraries
@@ -69,41 +71,63 @@ Minimal usage example
     # prepare data
     # the datasets are dataframes where:
         # the indexes correspond to the gene names
-        # the columns names correspond to the samples names
+        # the column names correspond to the sample names
     # Any number (>=2) of datasets can be treated
     dataset_1 = pd.read_pickle("dataset_1.pickle") # datasets can also be stored in csv, tsv, etc files
     dataset_2 = pd.read_pickle("dataset_2.pickle")
     dataset_3 = pd.read_pickle("dataset_3.pickle")
-    datasets = [dataset_1,dataset_2,dataset3]
 
     # we merge all the datasets into one, by keeping the common genes only
-    df_expression = pd.concat(datasets,join="inner",axis=1)
+    df_expression = pd.concat([dataset_1,dataset_2,dataset3],join="inner",axis=1)
 
     # plot raw data
     plt.boxplot(df_expression.transpose())
     plt.show()
 
-.. image:: raw_data.png
+.. image:: distrib_raw.png
   :width: 400
-  :alt: Alternative text
+  :alt: Distribution of raw data
+
+  Gene expression by sample in the raw data
 
 .. code-block:: Python
 
     # we generate the list of batches
     batch = []
     for j in range(len(datasets)):    
-        batch.extend([j for i in range(len(datasets[j].columns))])
+        batch.extend([j for _ in range(len(datasets[j].columns))])
 
-    #run pyComBat
+    # run pyComBat
     df_corrected = pycombat(df_expression,batch)
 
     # visualise results
     plt.boxplot(df_corrected.transpose())
     plt.show()
 
-.. image:: corrected_data.png
+.. image:: distrib_corrected.png
   :width: 400
-  :alt: Alternative text
+  :alt: Distribution of corrected data
+
+  Gene expression by sample in the corrected data
+
+Biological Insight
+------------------
+
+The data we used for the usage example contain tumor samples and normal samples. A simple PCA on the raw expression data shows that, instead of grouping by sample type, the data are clustered by dataset.
+
+.. image:: pca_raw.png
+    :width: 400
+    :alt: PCA for raw data
+    
+    PCA on the raw expression data, colored by tumor sample (blue and yellow) and normal sample (pink).
+
+However, after corrected for batch effects with pyComBat, the same PCA now shows two clusters, respectively with tumor and normal samples. 
+
+.. image:: pca_corrected.png
+    :width: 400
+    :alt: PCA for data corrected for batch effects
+
+    PCA on the batch-effects-corrected expression data, colored by tumor sample (blue and yellow) and normal sample (pink).
 
 Documentation for the code
 ==========================
