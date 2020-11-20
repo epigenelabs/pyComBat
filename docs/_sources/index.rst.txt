@@ -84,11 +84,11 @@ This minimal usage example illustrates how to use pyComBat in a default setting,
     plt.boxplot(df_expression.transpose())
     plt.show()
 
-.. image:: distrib_raw.png
-  :width: 400
+.. figure:: distrib_raw.png
+  :width: 600
   :alt: Distribution of raw data
 
-  Gene expression by sample in the raw data
+  Gene expression by sample in the raw data (colored by dataset).
 
 .. code-block:: Python
 
@@ -104,27 +104,27 @@ This minimal usage example illustrates how to use pyComBat in a default setting,
     plt.boxplot(df_corrected.transpose())
     plt.show()
 
-.. image:: distrib_corrected.png
-  :width: 400
+.. figure:: distrib_corrected.png
+  :width: 600
   :alt: Distribution of corrected data
 
-  Gene expression by sample in the corrected data
+  Gene expression by sample in the batch-effects-corrected data (colored by dataset).
 
 Biological Insight
 ------------------
 
 The data we used for the usage example contain tumor samples and normal samples. A simple PCA on the raw expression data shows that, instead of grouping by sample type, the data are clustered by dataset.
 
-.. image:: pca_raw.png
-    :width: 400
+.. figure:: pca_raw.png
+    :width: 600
     :alt: PCA for raw data
-    
+
     PCA on the raw expression data, colored by tumor sample (blue and yellow) and normal sample (pink).
 
-However, after corrected for batch effects with pyComBat, the same PCA now shows two clusters, respectively with tumor and normal samples. 
+However, after correcting for batch effects with pyComBat, the same PCA now shows two clusters, respectively with tumor and normal samples. 
 
-.. image:: pca_corrected.png
-    :width: 400
+.. figure:: pca_corrected.png
+    :width: 600
     :alt: PCA for data corrected for batch effects
 
     PCA on the batch-effects-corrected expression data, colored by tumor sample (blue and yellow) and normal sample (pink).

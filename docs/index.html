@@ -244,6 +244,10 @@ While the mathematical framework is strictly the same, pyComBat:</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
+<div class="figure align-default" id="id1">
+<a class="reference internal image-reference" href="_images/distrib_raw.png"><img alt="Distribution of raw data" src="_images/distrib_raw.png" style="width: 600px;" /></a>
+<p class="caption"><span class="caption-text">Gene expression by sample in the raw data (colored by dataset).</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</div>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># we generate the list of batches</span>
 <span class="n">batch</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">datasets</span><span class="p">)):</span>
@@ -257,11 +261,23 @@ While the mathematical framework is strictly the same, pyComBat:</p>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
+<div class="figure align-default" id="id2">
+<a class="reference internal image-reference" href="_images/distrib_corrected.png"><img alt="Distribution of corrected data" src="_images/distrib_corrected.png" style="width: 600px;" /></a>
+<p class="caption"><span class="caption-text">Gene expression by sample in the batch-effects-corrected data (colored by dataset).</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+</div>
 </div>
 <div class="section" id="biological-insight">
 <h2>Biological Insight<a class="headerlink" href="#biological-insight" title="Permalink to this headline">¶</a></h2>
 <p>The data we used for the usage example contain tumor samples and normal samples. A simple PCA on the raw expression data shows that, instead of grouping by sample type, the data are clustered by dataset.</p>
-<p>However, after corrected for batch effects with pyComBat, the same PCA now shows two clusters, respectively with tumor and normal samples.</p>
+<div class="figure align-default" id="id3">
+<a class="reference internal image-reference" href="_images/pca_raw.png"><img alt="PCA for raw data" src="_images/pca_raw.png" style="width: 600px;" /></a>
+<p class="caption"><span class="caption-text">PCA on the raw expression data, colored by tumor sample (blue and yellow) and normal sample (pink).</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+</div>
+<p>However, after correcting for batch effects with pyComBat, the same PCA now shows two clusters, respectively with tumor and normal samples.</p>
+<div class="figure align-default" id="id4">
+<a class="reference internal image-reference" href="_images/pca_corrected.png"><img alt="PCA for data corrected for batch effects" src="_images/pca_corrected.png" style="width: 600px;" /></a>
+<p class="caption"><span class="caption-text">PCA on the batch-effects-corrected expression data, colored by tumor sample (blue and yellow) and normal sample (pink).</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+</div>
 </div>
 </div>
 <div class="section" id="documentation-for-the-code">
