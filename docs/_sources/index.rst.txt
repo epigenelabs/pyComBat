@@ -59,7 +59,13 @@ Using pyComBat
 Minimal usage example
 ---------------------
 
-This minimal usage example illustrates how to use pyComBat in a default setting, and shows some results on ovarian cancer data, freely available on NCBI's `Gene Expression Omnibus <https://www.ncbi.nlm.nih.gov/geo/>`_.
+This minimal usage example illustrates how to use pyComBat in a default setting, and shows some results on ovarian cancer data, freely available on NCBI's `Gene Expression Omnibus <https://www.ncbi.nlm.nih.gov/geo/>`_, namely:
+
+    * GSE18520
+    * GSE66957
+    * GSE69428
+
+The corresponding expression files are available on `GitHub <https://github.com/epigenelabs/pyComBat/tree/master/data>`_.
 
 .. code-block:: Python
 
@@ -73,9 +79,9 @@ This minimal usage example illustrates how to use pyComBat in a default setting,
         # the indexes correspond to the gene names
         # the column names correspond to the sample names
     # Any number (>=2) of datasets can be treated
-    dataset_1 = pd.read_pickle("dataset_1.pickle") # datasets can also be stored in csv, tsv, etc files
-    dataset_2 = pd.read_pickle("dataset_2.pickle")
-    dataset_3 = pd.read_pickle("dataset_3.pickle")
+    dataset_1 = pd.read_pickle("data/GSE18520.pickle") # datasets can also be stored in csv, tsv, etc files
+    dataset_2 = pd.read_pickle("data/GSE66957.pickle")
+    dataset_3 = pd.read_pickle("data/GSE69428.pickle")
 
     # we merge all the datasets into one, by keeping the common genes only
     df_expression = pd.concat([dataset_1,dataset_2,dataset3],join="inner",axis=1)

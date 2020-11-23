@@ -13,6 +13,9 @@ misc/
 *.csv
 /data/*.pickle
 *.pickle
+!GSE18520.pickle
+!GSE66957.pickle
+!GSE69428.pickle
 /data/*.pkl
 *.pkl
 
