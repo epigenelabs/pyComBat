@@ -29,6 +29,7 @@ from multiprocessing import Pool, cpu_count
 from functools import partial
 import mpmath as mp
 import pandas as pd
+from patsy import dmatrix
 
 #import unittest
 
@@ -69,7 +70,7 @@ def all_1(list_of_elements):
     Returns:
         bool -- True iff all elements of the list are 1s
     """
-    return(sum(list_of_elements) == len(list_of_elements))
+    return((list_of_elements == 1).all())
 
 # aprior and bprior are useful to compute "hyper-prior values"
 # -> prior parameters used to estimate the prior gamma distribution for multiplicative batch effect
@@ -331,7 +332,7 @@ def check_ref_batch(ref_batch, batch, batchmod):
         # ref keeps in memory the columns concerned by the reference batch
         ref = np.where(np.unique(batch) == ref_batch)[0][0]
         # updates batchmod with reference
-        batchmod[ref] = [1]*len(batchmod[ref])
+        batchmod[:,ref] = 1
     else:
         ref = None  # default settings
     return(ref, batchmod)
@@ -376,15 +377,20 @@ def treat_covariates(batchmod, mod, ref, n_batch):
         check {bool list} -- a list characterising all covariates
         design {matrix} -- model matrix for all covariates, including batch
     """
-    design = batchmod + \
-        mod  # general matrix containing the information about the different covariates (batch included)
+    if mod == []:
+        design = dmatrix("~-1 + batchmod")
+    else:
+        mod_matrix = dmatrix("~C(mod)")
+        design = dmatrix("~-1 + batchmod + mod_matrix")
     # design matrix for sample conditions
-    check = list(map(all_1, design))
+    design = np.asarray(design)
+    check = list(map(all_1, np.transpose(design)))
     if ref is not None:  # if ref
         check[ref] = False  # the reference in not considered as a covariate
-    design = np.asarray(design)
-    design = design[[not el for el in check]]
-    print("Adjusting for "+str(len(design)-len(batchmod)) +
+    design = design[:, ~np.array(check)]
+    design = np.transpose(design)
+
+    print("Adjusting for "+str(len(design)-len(np.transpose(batchmod))) +
           " covariate(s) or covariate level(s).")
 
     # if matrix cannot be invertible, different cases
@@ -647,7 +653,7 @@ def pycombat(data, batch, mod=[], par_prior=True, prior_plots=False, mean_only=F
 
     check_mean_only(mean_only)
 
-    batchmod = define_batchmod(batch)
+    batchmod = dmatrix("~-1 + C(batch)")
     ref, batchmod = check_ref_batch(ref_batch, batch, batchmod)
     n_batch, batches, n_batches, n_array = treat_batches(batch)
     design = treat_covariates(batchmod, mod, ref, n_batch)
