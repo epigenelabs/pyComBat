@@ -30,6 +30,7 @@
 
 import numpy as np
 import pandas as pd
+from patsy import dmatrix
 
 ##########
 # import function used for unit testing
@@ -83,7 +84,8 @@ par_prior = False
 precision = None
 mod = []
 dat = matrix.values
-batchmod = define_batchmod(batch)
+#batchmod = define_batchmod(batch)
+batchmod = dmatrix("~-1 + C(batch)")
 ref,batchmod = check_ref_batch(ref_batch,batch,batchmod)
 n_batch, batches, n_batches, n_array = treat_batches(batch)
 design = treat_covariates(batchmod, mod, ref, n_batch)
@@ -129,12 +131,12 @@ def test_model_matrix():
 
 # tests for all_1 function
 def test_all_1():
-    assert all_1([1,1,1,1,1]) == True
+    assert all_1(np.array([1,1,1,1,1])) == True
 
-    assert all_1([1,1,1,1,0]) == False
-    assert all_1([0,0,0,0,0]) == False
+    assert all_1(np.array([1,1,1,1,0])) == False
+    assert all_1(np.array([0,0,0,0,0])) == False
 
-    assert all_1([1.5,0.5,1,1,1]) == True # This test to show the limit of the method we use
+    assert all_1(np.array([1.5,0.5,1,1,1])) == False # This test to show the limit of the method we use
 
 # test for check_mean_only
 def test_check_mean_only():
