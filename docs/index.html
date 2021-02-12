@@ -302,7 +302,7 @@ While the mathematical framework is strictly the same, pyComBat:</p>
 <dt>Arguments:</dt><dd><p>data {matrix} – The expression matrix (dataframe). It contains the information about the gene expression (rows) for each sample (columns).</p>
 <p>batch {list} – List of batch indexes. The batch list describes the batch for each sample. The batches list has as many elements as the number of columns in the expression matrix.</p>
 </dd>
-<dt>Keyword Arguments:</dt><dd><p>mod {list} – Model matrix for covariates description (default: {[]})</p>
+<dt>Keyword Arguments:</dt><dd><p>mod {list} – List of covariates indexes. The mod list describes the covariate for each sample. The mod list has as many elements as the number of columns in the expression matrix (default: {[]}).</p>
 <p>par_prior {bool} – False for non-parametric estimation of batch effects (default: {True})</p>
 <p>prior_plots {bool} – True if requires to plot the priors (default: {False} – Not implemented yet!)</p>
 <p>mean_only {bool} – True iff just adjusting the means and not individual batch effects (default: {False})</p>
