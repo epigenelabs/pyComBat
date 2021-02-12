@@ -6,9 +6,7 @@ More detailed documentation can be found at [this address](https://epigenelabs.g
 
 ## TO DO
 
-- [ ] Benchmark with scanpy
-- [ ] Add imputation of missing values
-- [ ] Add unit testing on covariates and model matrix
+- [ ] Update unit testing
 
 ## Minimum dependencies
 
@@ -23,6 +21,8 @@ We list here the versions of the packages that have been used for development/te
 * mpmath 1.1.0
 
 * pandas 0.24.2
+
+* patsy 0.5.1
 
 ### Documentation
 
