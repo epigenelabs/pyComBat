@@ -631,7 +631,7 @@ def pycombat(data, batch, mod=[], par_prior=True, prior_plots=False, mean_only=F
         batch {list} -- List of batch indexes. The batch list describes the batch for each sample. The batches list has as many elements as the number of columns in the expression matrix.
 
     Keyword Arguments:
-        mod {list} -- Model matrix for covariates description (default: {[]})
+        mod {list} -- List of covariates indexes. The mod list describes the covariate for each sample. The mod list has as many elements as the number of columns in the expression matrix (default: {[]}).
 
         par_prior {bool} -- False for non-parametric estimation of batch effects (default: {True})
 
