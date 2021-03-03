@@ -139,15 +139,14 @@ def test_all_1():
     assert all_1(np.array([1.5,0.5,1,1,1])) == False # This test to show the limit of the method we use
 
 def test_covariate_model_matrix():
-    np.random.seed(42)
-    mod1 = list(np.random.choice(["a", "b", "c"], size=10))
-    mod2 = list(np.random.choice(["d", "e"], size=10))
+    mod1 = ["a", "a", "a", "a", "a", "b", "b", "c", "c", "c"]
+    mod2 = ["d", "d", "d", "e", "e", "e", "e", "e", "e", "e"]
     mod = [mod1, mod2]
     res = np.asarray(covariate_model_matrix(mod))
 
     assert len(res) == 10
     assert len(res[0]) == 4
-    assert list(res[0]) == [1,0,1,0]
+    assert list(res[0]) == [1,0,0,0]
 
 # test for check_mean_only
 def test_check_mean_only():
