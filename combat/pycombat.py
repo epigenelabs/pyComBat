@@ -74,10 +74,14 @@ def all_1(list_of_elements):
 
 
 def covariate_model_matrix(mod):
+    if not isinstance(mod[0],list) :
+        mod_cor = [mod]
+    else:
+        mod_cor = mod
     cov_dict = {}
     cov_list = []
-    for i in range(len(mod)):
-        cov_dict[f"mod{str(i)}"] = mod[i]
+    for i in range(len(mod_cor)):
+        cov_dict[f"mod{str(i)}"] = mod_cor[i]
         cov_list.append(f"C(mod{str(i)})")
     return dmatrix(f"~{'+'.join(cov_list)}", cov_dict)
 
