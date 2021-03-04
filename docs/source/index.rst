@@ -23,7 +23,7 @@ While the mathematical framework is strictly the same, pyComBat:
 
 Implementation
 --------------
-pyComBat is an open source program written in Python language version 3.7.3. It can only be run as a command line. It is available at https://github.com/epigenelabs/pyComBat.
+pyComBat is an open source program written in Python language version 3.7.3. It can be run as a command line or a Python library. It is available at https://github.com/epigenelabs/pyComBat.
 
 License
 -------

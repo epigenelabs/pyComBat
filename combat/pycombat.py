@@ -631,17 +631,17 @@ def pycombat(data, batch, mod=[], par_prior=True, prior_plots=False, mean_only=F
         batch {list} -- List of batch indexes. The batch list describes the batch for each sample. The batches list has as many elements as the number of columns in the expression matrix.
 
     Keyword Arguments:
-        mod {list} -- List of covariates indexes. The mod list describes the covariate for each sample. The mod list has as many elements as the number of columns in the expression matrix (default: {[]}).
+        mod {list} -- List (or list of lists) of covariate(s) indexes. The mod list describes the covariate(s) for each sample. Each mod list has as many elements as the number of columns in the expression matrix (default: {[]}).
 
-        par_prior {bool} -- False for non-parametric estimation of batch effects (default: {True})
+        par_prior {bool} -- False for non-parametric estimation of batch effects (default: {True}).
 
-        prior_plots {bool} -- True if requires to plot the priors (default: {False} -- Not implemented yet!)
+        prior_plots {bool} -- True if requires to plot the priors (default: {False} -- Not implemented yet!).
 
-        mean_only {bool} -- True iff just adjusting the means and not individual batch effects (default: {False})
+        mean_only {bool} -- True iff just adjusting the means and not individual batch effects (default: {False}).
 
-        ref_batch {int} -- reference batch selected (default: {None})
+        ref_batch {int} -- reference batch selected (default: {None}).
 
-        precision {float} -- level of precision for precision computing (default: {None})
+        precision {float} -- level of precision for precision computing (default: {None}).
 
     Returns:
         bayes_data_df -- The expression dataframe adjusted for batch effects.
