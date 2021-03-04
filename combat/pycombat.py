@@ -72,6 +72,16 @@ def all_1(list_of_elements):
     """
     return((list_of_elements == 1).all())
 
+
+def covariate_model_matrix(mod):
+    cov_dict = {}
+    cov_list = []
+    for i in range(len(mod)):
+        cov_dict[f"mod{str(i)}"] = mod[i]
+        cov_list.append(f"C(mod{str(i)})")
+    return dmatrix(f"~{'+'.join(cov_list)}", cov_dict)
+
+
 # aprior and bprior are useful to compute "hyper-prior values"
 # -> prior parameters used to estimate the prior gamma distribution for multiplicative batch effect
 # aprior - calculates empirical hyper-prior values
@@ -380,7 +390,8 @@ def treat_covariates(batchmod, mod, ref, n_batch):
     if mod == []:
         design = dmatrix("~-1 + batchmod")
     else:
-        mod_matrix = dmatrix("~C(mod)")
+        #mod_matrix = dmatrix("~C(mod)")
+        mod_matrix = covariate_model_matrix(mod)
         design = dmatrix("~-1 + batchmod + mod_matrix")
     # design matrix for sample conditions
     design = np.asarray(design)
