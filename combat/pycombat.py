@@ -438,8 +438,7 @@ def check_NAs(dat):
     # NAs = True in (np.isnan(dat))
     NAs = np.isnan(np.sum(dat))  # Check if NaN exists
     if NAs:
-        print("Found missing data values.")
-        exit(0)
+        print("Found missing data values. Please remove all missing values before proceeding with pyComBat.")
     return(NAs)
 
 
@@ -674,18 +673,19 @@ def pycombat(data, batch, mod=[], par_prior=True, prior_plots=False, mean_only=F
     n_batch, batches, n_batches, n_array = treat_batches(batch)
     design = treat_covariates(batchmod, mod, ref, n_batch)
     NAs = check_NAs(dat)
-    B_hat, grand_mean, var_pooled = calculate_mean_var(
-        design, batches, ref, dat, NAs, ref_batch, n_batches, n_batch, n_array)
-    stand_mean = calculate_stand_mean(
-        grand_mean, n_array, design, n_batch, B_hat)
-    s_data = standardise_data(dat, stand_mean, var_pooled, n_array)
-    gamma_star, delta_star, batch_design = fit_model(
-        design, n_batch, s_data, batches, mean_only, par_prior, precision, ref_batch, ref, NAs)
-    bayes_data = adjust_data(s_data, gamma_star, delta_star, batch_design,
-                             n_batches, var_pooled, stand_mean, n_array, ref_batch, ref, batches, dat)
-    
-    bayes_data_df = pd.DataFrame(bayes_data,
-                 columns = list_samples,
-                 index = list_genes)
+    if not(NAs):
+        B_hat, grand_mean, var_pooled = calculate_mean_var(
+            design, batches, ref, dat, NAs, ref_batch, n_batches, n_batch, n_array)
+        stand_mean = calculate_stand_mean(
+            grand_mean, n_array, design, n_batch, B_hat)
+        s_data = standardise_data(dat, stand_mean, var_pooled, n_array)
+        gamma_star, delta_star, batch_design = fit_model(
+            design, n_batch, s_data, batches, mean_only, par_prior, precision, ref_batch, ref, NAs)
+        bayes_data = adjust_data(s_data, gamma_star, delta_star, batch_design,
+                                n_batches, var_pooled, stand_mean, n_array, ref_batch, ref, batches, dat)
+        
+        bayes_data_df = pd.DataFrame(bayes_data,
+                    columns = list_samples,
+                    index = list_genes)
 
-    return(bayes_data_df)
+        return(bayes_data_df)
