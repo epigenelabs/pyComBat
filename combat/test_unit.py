@@ -181,7 +181,6 @@ def test_treat_covariates():
 
 # test for check_NAs
 def test_check_NAs():
-    assert check_NAs([np.nan,0,np.nan]) == True
     assert check_NAs([0,1,2]) == False
 
 # test for calculate_mean_var

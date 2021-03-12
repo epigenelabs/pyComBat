@@ -337,7 +337,7 @@ def check_ref_batch(ref_batch, batch, batchmod):
         ref {int list} -- the corresponding positions of the reference batch in the batch list
         batchmod {matrix} -- updated model matrix related to batches, with reference
     """
-    if ref_batch:
+    if ref_batch is not None:
         if ref_batch not in batch:
             print("Reference level ref.batch must be one of the levels of batch.")
             exit(0)
@@ -439,6 +439,7 @@ def check_NAs(dat):
     NAs = np.isnan(np.sum(dat))  # Check if NaN exists
     if NAs:
         print("Found missing data values.")
+        exit(0)
     return(NAs)
 
 
