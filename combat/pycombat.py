@@ -29,36 +29,31 @@ from multiprocessing import Pool, cpu_count
 from functools import partial
 import mpmath as mp
 import pandas as pd
-from patsy import dmatrix
 
 #import unittest
 
 
-def model_matrix(batch):
+def model_matrix(info, intercept=True):
     """Creates the model_matrix from batch list
 
     Arguments:
-        batch {list} -- batch list from main arguments
+        info {list} -- list info with batch or covariates data
+        intercept {bool} -- boolean for intercept in model matrix
 
     Returns:
         matrix -- model matrix generate from batch list
     """
-    # list_elts_batch = list(
-    #     set(batch))
-    list_elts_batch = sorted(list(set(batch)))
-    n = len(batch)
-    n_batch = len(list_elts_batch)
-    dict_batch = {}
-
-    mat = [[0] * n for _ in range(n_batch)]
-
-    for i in range(n_batch):
-        dict_batch[list_elts_batch[i]] = i
-
-    for i in range(n):
-        mat[dict_batch[batch[i]]][i] = 1
-
-    return mat
+    if not isinstance(info[0],list) :
+        info = [info]
+    else:
+        info = info
+    info_dict = {}
+    for i in range(len(info)):
+        info_dict[f"col{str(i)}"] = list(map(str,info[i]))
+    df = pd.get_dummies(pd.DataFrame(info_dict), drop_first=True, dtype=float)
+    if intercept:
+        df["intercept"] = 1.0
+    return df.to_numpy()
 
 
 def all_1(list_of_elements):
@@ -71,19 +66,6 @@ def all_1(list_of_elements):
         bool -- True iff all elements of the list are 1s
     """
     return((list_of_elements == 1).all())
-
-
-def covariate_model_matrix(mod):
-    if not isinstance(mod[0],list) :
-        mod_cor = [mod]
-    else:
-        mod_cor = mod
-    cov_dict = {}
-    cov_list = []
-    for i in range(len(mod_cor)):
-        cov_dict[f"mod{str(i)}"] = mod_cor[i]
-        cov_list.append(f"C(mod{str(i)})")
-    return dmatrix(f"~{'+'.join(cov_list)}", cov_dict)
 
 
 # aprior and bprior are useful to compute "hyper-prior values"
@@ -391,14 +373,12 @@ def treat_covariates(batchmod, mod, ref, n_batch):
         check {bool list} -- a list characterising all covariates
         design {matrix} -- model matrix for all covariates, including batch
     """
-    if mod == []:
-        design = dmatrix("~-1 + batchmod")
-    else:
-        #mod_matrix = dmatrix("~C(mod)")
-        mod_matrix = covariate_model_matrix(mod)
-        design = dmatrix("~-1 + batchmod + mod_matrix")
     # design matrix for sample conditions
-    design = np.asarray(design)
+    if mod == []:
+        design = batchmod
+    else:
+        mod_matrix = model_matrix(mod, intercept=True)
+        design = np.concatenate((batchmod, mod_matrix), axis=1)
     check = list(map(all_1, np.transpose(design)))
     if ref is not None:  # if ref
         check[ref] = False  # the reference in not considered as a covariate
@@ -668,7 +648,8 @@ def pycombat(data, batch, mod=[], par_prior=True, prior_plots=False, mean_only=F
 
     check_mean_only(mean_only)
 
-    batchmod = dmatrix("~-1 + C(batch)")
+    #batchmod = dmatrix("~-1 + C(batch)")
+    batchmod = model_matrix(batch, intercept=False)
     ref, batchmod = check_ref_batch(ref_batch, batch, batchmod)
     n_batch, batches, n_batches, n_array = treat_batches(batch)
     design = treat_covariates(batchmod, mod, ref, n_batch)
