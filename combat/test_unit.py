@@ -30,11 +30,12 @@
 
 import numpy as np
 import pandas as pd
-from patsy import dmatrix
+#from patsy import dmatrix
 
 ##########
 # import function used for unit testing
-from .pycombat import model_matrix, all_1, covariate_model_matrix
+from .pycombat import model_matrix, all_1
+#covariate_model_matrix
 from .pycombat import compute_prior, postmean, postvar, it_sol, int_eprior
 from .pycombat import check_mean_only, define_batchmod, check_ref_batch, treat_batches, treat_covariates, check_NAs
 from .pycombat import calculate_mean_var, calculate_stand_mean
@@ -85,7 +86,7 @@ precision = None
 mod = []
 dat = matrix.values
 #batchmod = define_batchmod(batch)
-batchmod = dmatrix("~-1 + C(batch)")
+batchmod = model_matrix(list(batch), intercept=False, drop_first=False)
 ref,batchmod = check_ref_batch(ref_batch,batch,batchmod)
 n_batch, batches, n_batches, n_array = treat_batches(batch)
 design = treat_covariates(batchmod, mod, ref, n_batch)
@@ -126,8 +127,8 @@ def test_int_eprior():
 # test for model_matrix
 def test_model_matrix():
     model_matrix_test = model_matrix([1,1,0,1,0])
-    assert np.shape(model_matrix_test) == (2,5)
-    assert model_matrix_test[0] == [0,0,1,0,1]
+    assert np.shape(model_matrix_test) == (5,2)
+    assert list(model_matrix_test[0]) == [1.0,1.0]
 
 # tests for all_1 function
 def test_all_1():
@@ -138,15 +139,6 @@ def test_all_1():
 
     assert all_1(np.array([1.5,0.5,1,1,1])) == False # This test to show the limit of the method we use
 
-def test_covariate_model_matrix():
-    mod1 = ["a", "a", "a", "a", "a", "b", "b", "c", "c", "c"]
-    mod2 = ["d", "d", "d", "e", "e", "e", "e", "e", "e", "e"]
-    mod = [mod1, mod2]
-    res = np.asarray(covariate_model_matrix(mod))
-
-    assert len(res) == 10
-    assert len(res[0]) == 4
-    assert list(res[0]) == [1,0,0,0]
 
 # test for check_mean_only
 def test_check_mean_only():
@@ -156,7 +148,7 @@ def test_check_mean_only():
 
 # test for define_batchmode
 def test_define_batchmod():
-    assert np.shape(define_batchmod(batch)) == (3,9)
+    assert np.shape(define_batchmod(batch)) == (9,3)
 
 # test for check_ref_batch
 def test_check_ref_batch():
@@ -177,7 +169,7 @@ def test_treat_batches():
 # test for treat_covariates
 def test_treat_covariates():
     batchmod = define_batchmod(batch)
-    assert np.sum(design - batchmod) == 0
+    assert np.sum(design - np.transpose(batchmod)) == 0
 
 # test for check_NAs
 def test_check_NAs():

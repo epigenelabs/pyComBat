@@ -33,7 +33,7 @@ import pandas as pd
 #import unittest
 
 
-def model_matrix(info, intercept=True):
+def model_matrix(info, intercept=True, drop_first=True):
     """Creates the model_matrix from batch list
 
     Arguments:
@@ -50,7 +50,7 @@ def model_matrix(info, intercept=True):
     info_dict = {}
     for i in range(len(info)):
         info_dict[f"col{str(i)}"] = list(map(str,info[i]))
-    df = pd.get_dummies(pd.DataFrame(info_dict), drop_first=True, dtype=float)
+    df = pd.get_dummies(pd.DataFrame(info_dict), drop_first=drop_first, dtype=float)
     if intercept:
         df["intercept"] = 1.0
     return df.to_numpy()
@@ -303,7 +303,7 @@ def define_batchmod(batch):
     Returns:
         batchmod {matrix} -- model matrix for batches
     """
-    batchmod = model_matrix(batch)
+    batchmod = model_matrix(list(batch), intercept=False, drop_first=False)
     return(batchmod)
 
 
@@ -648,8 +648,7 @@ def pycombat(data, batch, mod=[], par_prior=True, prior_plots=False, mean_only=F
 
     check_mean_only(mean_only)
 
-    #batchmod = dmatrix("~-1 + C(batch)")
-    batchmod = model_matrix(batch, intercept=False)
+    batchmod = define_batchmod(batch)
     ref, batchmod = check_ref_batch(ref_batch, batch, batchmod)
     n_batch, batches, n_batches, n_array = treat_batches(batch)
     design = treat_covariates(batchmod, mod, ref, n_batch)
