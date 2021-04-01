@@ -373,7 +373,7 @@ def treat_batches(batch):
     n_batches = list(map(len, batches))
     if 1 in n_batches:
         #mean_only = True  # no variance if only one sample in a batch - mean_only has to be used
-        print("One batch has only one sample, try setting mean_only=True.")
+        print("\nOne batch has only one sample, try setting mean_only=True.\n")
     n_array = sum(n_batches)
     return(n_batch, batches, n_batches, n_array)
 
@@ -689,3 +689,5 @@ def pycombat(data, batch, mod=[], par_prior=True, prior_plots=False, mean_only=F
                     index = list_genes)
 
         return(bayes_data_df)
+    else:
+        raise ValueError("NaN value is not accepted")

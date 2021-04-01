@@ -100,6 +100,7 @@ The corresponding expression files are available on `GitHub <https://github.com/
 
     # we generate the list of batches
     batch = []
+    datasets = [dataset_1,dataset_2,dataset_3]
     for j in range(len(datasets)):    
         batch.extend([j for _ in range(len(datasets[j].columns))])
 
