@@ -220,6 +220,20 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span><span class="p">((</span><span class="n">list_of_elements</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
 
+
+<span class="k">def</span> <span class="nf">covariate_model_matrix</span><span class="p">(</span><span class="n">mod</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mod</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="nb">list</span><span class="p">)</span> <span class="p">:</span>
+        <span class="n">mod_cor</span> <span class="o">=</span> <span class="p">[</span><span class="n">mod</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">mod_cor</span> <span class="o">=</span> <span class="n">mod</span>
+    <span class="n">cov_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">cov_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mod_cor</span><span class="p">)):</span>
+        <span class="n">cov_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;mod</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mod_cor</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">cov_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;C(mod</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dmatrix</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;~</span><span class="si">{</span><span class="s1">&#39;+&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cov_list</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">cov_dict</span><span class="p">)</span>
+
+
 <span class="c1"># aprior and bprior are useful to compute &quot;hyper-prior values&quot;</span>
 <span class="c1"># -&gt; prior parameters used to estimate the prior gamma distribution for multiplicative batch effect</span>
 <span class="c1"># aprior - calculates empirical hyper-prior values</span>
@@ -471,7 +485,7 @@
 <span class="sd">        ref {int list} -- the corresponding positions of the reference batch in the batch list</span>
 <span class="sd">        batchmod {matrix} -- updated model matrix related to batches, with reference</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">ref_batch</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">ref_batch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">ref_batch</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reference level ref.batch must be one of the levels of batch.&quot;</span><span class="p">)</span>
             <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -507,7 +521,7 @@
     <span class="n">n_batches</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="n">batches</span><span class="p">))</span>
     <span class="k">if</span> <span class="mi">1</span> <span class="ow">in</span> <span class="n">n_batches</span><span class="p">:</span>
         <span class="c1">#mean_only = True  # no variance if only one sample in a batch - mean_only has to be used</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;One batch has only one sample, try setting mean_only=True.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">One batch has only one sample, try setting mean_only=True.</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">n_array</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">n_batches</span><span class="p">)</span>
     <span class="k">return</span><span class="p">(</span><span class="n">n_batch</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">n_batches</span><span class="p">,</span> <span class="n">n_array</span><span class="p">)</span>
 
@@ -528,7 +542,8 @@
     <span class="k">if</span> <span class="n">mod</span> <span class="o">==</span> <span class="p">[]:</span>
         <span class="n">design</span> <span class="o">=</span> <span class="n">dmatrix</span><span class="p">(</span><span class="s2">&quot;~-1 + batchmod&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">mod_matrix</span> <span class="o">=</span> <span class="n">dmatrix</span><span class="p">(</span><span class="s2">&quot;~C(mod)&quot;</span><span class="p">)</span>
+        <span class="c1">#mod_matrix = dmatrix(&quot;~C(mod)&quot;)</span>
+        <span class="n">mod_matrix</span> <span class="o">=</span> <span class="n">covariate_model_matrix</span><span class="p">(</span><span class="n">mod</span><span class="p">)</span>
         <span class="n">design</span> <span class="o">=</span> <span class="n">dmatrix</span><span class="p">(</span><span class="s2">&quot;~-1 + batchmod + mod_matrix&quot;</span><span class="p">)</span>
     <span class="c1"># design matrix for sample conditions</span>
     <span class="n">design</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">design</span><span class="p">)</span>
@@ -571,7 +586,7 @@
     <span class="c1"># NAs = True in (np.isnan(dat))</span>
     <span class="n">NAs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dat</span><span class="p">))</span>  <span class="c1"># Check if NaN exists</span>
     <span class="k">if</span> <span class="n">NAs</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Found missing data values.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Found missing data values. Please remove all missing values before proceeding with pyComBat.&quot;</span><span class="p">)</span>
     <span class="k">return</span><span class="p">(</span><span class="n">NAs</span><span class="p">)</span>
 
 
@@ -779,17 +794,17 @@
 <span class="sd">        batch {list} -- List of batch indexes. The batch list describes the batch for each sample. The batches list has as many elements as the number of columns in the expression matrix.</span>
 
 <span class="sd">    Keyword Arguments:</span>
-<span class="sd">        mod {list} -- List of covariates indexes. The mod list describes the covariate for each sample. The mod list has as many elements as the number of columns in the expression matrix (default: {[]}).</span>
+<span class="sd">        mod {list} -- List (or list of lists) of covariate(s) indexes. The mod list describes the covariate(s) for each sample. Each mod list has as many elements as the number of columns in the expression matrix (default: {[]}).</span>
 
-<span class="sd">        par_prior {bool} -- False for non-parametric estimation of batch effects (default: {True})</span>
+<span class="sd">        par_prior {bool} -- False for non-parametric estimation of batch effects (default: {True}).</span>
 
-<span class="sd">        prior_plots {bool} -- True if requires to plot the priors (default: {False} -- Not implemented yet!)</span>
+<span class="sd">        prior_plots {bool} -- True if requires to plot the priors (default: {False} -- Not implemented yet!).</span>
 
-<span class="sd">        mean_only {bool} -- True iff just adjusting the means and not individual batch effects (default: {False})</span>
+<span class="sd">        mean_only {bool} -- True iff just adjusting the means and not individual batch effects (default: {False}).</span>
 
-<span class="sd">        ref_batch {int} -- reference batch selected (default: {None})</span>
+<span class="sd">        ref_batch {int} -- reference batch selected (default: {None}).</span>
 
-<span class="sd">        precision {float} -- level of precision for precision computing (default: {None})</span>
+<span class="sd">        precision {float} -- level of precision for precision computing (default: {None}).</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        bayes_data_df -- The expression dataframe adjusted for batch effects.</span>
@@ -806,21 +821,24 @@
     <span class="n">n_batch</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">n_batches</span><span class="p">,</span> <span class="n">n_array</span> <span class="o">=</span> <span class="n">treat_batches</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
     <span class="n">design</span> <span class="o">=</span> <span class="n">treat_covariates</span><span class="p">(</span><span class="n">batchmod</span><span class="p">,</span> <span class="n">mod</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">)</span>
     <span class="n">NAs</span> <span class="o">=</span> <span class="n">check_NAs</span><span class="p">(</span><span class="n">dat</span><span class="p">)</span>
-    <span class="n">B_hat</span><span class="p">,</span> <span class="n">grand_mean</span><span class="p">,</span> <span class="n">var_pooled</span> <span class="o">=</span> <span class="n">calculate_mean_var</span><span class="p">(</span>
-        <span class="n">design</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">NAs</span><span class="p">,</span> <span class="n">ref_batch</span><span class="p">,</span> <span class="n">n_batches</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">,</span> <span class="n">n_array</span><span class="p">)</span>
-    <span class="n">stand_mean</span> <span class="o">=</span> <span class="n">calculate_stand_mean</span><span class="p">(</span>
-        <span class="n">grand_mean</span><span class="p">,</span> <span class="n">n_array</span><span class="p">,</span> <span class="n">design</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">,</span> <span class="n">B_hat</span><span class="p">)</span>
-    <span class="n">s_data</span> <span class="o">=</span> <span class="n">standardise_data</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">stand_mean</span><span class="p">,</span> <span class="n">var_pooled</span><span class="p">,</span> <span class="n">n_array</span><span class="p">)</span>
-    <span class="n">gamma_star</span><span class="p">,</span> <span class="n">delta_star</span><span class="p">,</span> <span class="n">batch_design</span> <span class="o">=</span> <span class="n">fit_model</span><span class="p">(</span>
-        <span class="n">design</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">,</span> <span class="n">s_data</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">mean_only</span><span class="p">,</span> <span class="n">par_prior</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">ref_batch</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">NAs</span><span class="p">)</span>
-    <span class="n">bayes_data</span> <span class="o">=</span> <span class="n">adjust_data</span><span class="p">(</span><span class="n">s_data</span><span class="p">,</span> <span class="n">gamma_star</span><span class="p">,</span> <span class="n">delta_star</span><span class="p">,</span> <span class="n">batch_design</span><span class="p">,</span>
-                             <span class="n">n_batches</span><span class="p">,</span> <span class="n">var_pooled</span><span class="p">,</span> <span class="n">stand_mean</span><span class="p">,</span> <span class="n">n_array</span><span class="p">,</span> <span class="n">ref_batch</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">dat</span><span class="p">)</span>
-    
-    <span class="n">bayes_data_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">bayes_data</span><span class="p">,</span>
-                 <span class="n">columns</span> <span class="o">=</span> <span class="n">list_samples</span><span class="p">,</span>
-                 <span class="n">index</span> <span class="o">=</span> <span class="n">list_genes</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span><span class="p">(</span><span class="n">NAs</span><span class="p">):</span>
+        <span class="n">B_hat</span><span class="p">,</span> <span class="n">grand_mean</span><span class="p">,</span> <span class="n">var_pooled</span> <span class="o">=</span> <span class="n">calculate_mean_var</span><span class="p">(</span>
+            <span class="n">design</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">dat</span><span class="p">,</span> <span class="n">NAs</span><span class="p">,</span> <span class="n">ref_batch</span><span class="p">,</span> <span class="n">n_batches</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">,</span> <span class="n">n_array</span><span class="p">)</span>
+        <span class="n">stand_mean</span> <span class="o">=</span> <span class="n">calculate_stand_mean</span><span class="p">(</span>
+            <span class="n">grand_mean</span><span class="p">,</span> <span class="n">n_array</span><span class="p">,</span> <span class="n">design</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">,</span> <span class="n">B_hat</span><span class="p">)</span>
+        <span class="n">s_data</span> <span class="o">=</span> <span class="n">standardise_data</span><span class="p">(</span><span class="n">dat</span><span class="p">,</span> <span class="n">stand_mean</span><span class="p">,</span> <span class="n">var_pooled</span><span class="p">,</span> <span class="n">n_array</span><span class="p">)</span>
+        <span class="n">gamma_star</span><span class="p">,</span> <span class="n">delta_star</span><span class="p">,</span> <span class="n">batch_design</span> <span class="o">=</span> <span class="n">fit_model</span><span class="p">(</span>
+            <span class="n">design</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">,</span> <span class="n">s_data</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">mean_only</span><span class="p">,</span> <span class="n">par_prior</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">ref_batch</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">NAs</span><span class="p">)</span>
+        <span class="n">bayes_data</span> <span class="o">=</span> <span class="n">adjust_data</span><span class="p">(</span><span class="n">s_data</span><span class="p">,</span> <span class="n">gamma_star</span><span class="p">,</span> <span class="n">delta_star</span><span class="p">,</span> <span class="n">batch_design</span><span class="p">,</span>
+                                <span class="n">n_batches</span><span class="p">,</span> <span class="n">var_pooled</span><span class="p">,</span> <span class="n">stand_mean</span><span class="p">,</span> <span class="n">n_array</span><span class="p">,</span> <span class="n">ref_batch</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">dat</span><span class="p">)</span>
+        
+        <span class="n">bayes_data_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">bayes_data</span><span class="p">,</span>
+                    <span class="n">columns</span> <span class="o">=</span> <span class="n">list_samples</span><span class="p">,</span>
+                    <span class="n">index</span> <span class="o">=</span> <span class="n">list_genes</span><span class="p">)</span>
 
-    <span class="k">return</span><span class="p">(</span><span class="n">bayes_data_df</span><span class="p">)</span></div>
+        <span class="k">return</span><span class="p">(</span><span class="n">bayes_data_df</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;NaN value is not accepted&quot;</span><span class="p">)</span></div>
 </pre></div>
 
            </div>
