@@ -24,9 +24,9 @@ pyComBat 0.2.1
 
 * Performances enhancement
 
-## [0.2.2] - 12-03-2021
+## [0.3.0] - 12-03-2021
 
-pyComBat 0.2.2
+pyComBat 0.3.0
 
 * Corrected a bug preventing the use of multiple covariates at the same time
 

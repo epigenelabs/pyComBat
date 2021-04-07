@@ -4,6 +4,12 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
+    install_requires=[
+        "numpy==1.18.5",
+        "mpmath==1.1.0",
+        "pandas==1.1.5",
+        "patsy==0.5.1"
+    ],
     name="combat",
     version="0.2.1",
     author="Abdelkader Behdenna",
