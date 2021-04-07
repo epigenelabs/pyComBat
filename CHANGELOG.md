@@ -15,3 +15,23 @@ pyComBat 0.2.0
 * Corrected a bug forbidding the first batch to be a reference batch
 
 * Added unit testing
+
+## [0.2.1] - 12-02-2021
+
+pyComBat 0.2.1
+
+* Covariates can now be defined by a simple list instead of a model matrix
+
+* Performances enhancement
+
+## [0.3.0] - 12-03-2021
+
+pyComBat 0.3.0
+
+* Corrected a bug preventing the use of multiple covariates at the same time
+
+* Corrected a bug preventing the use of batch 0 as a reference batch
+
+* pyComBat now exits with an informative message when nans are detected
+
+* Removed soon deprecated functions calls

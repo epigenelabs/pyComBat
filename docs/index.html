@@ -194,7 +194,7 @@ While the mathematical framework is strictly the same, pyComBat:</p>
 </div>
 <div class="section" id="implementation">
 <h2>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h2>
-<p>pyComBat is an open source program written in Python language version 3.7.3. It can only be run as a command line. It is available at <a class="reference external" href="https://github.com/epigenelabs/pyComBat">https://github.com/epigenelabs/pyComBat</a>.</p>
+<p>pyComBat is an open source program written in Python language version 3.7.3. It can be run as a command line or a Python library. It is available at <a class="reference external" href="https://github.com/epigenelabs/pyComBat">https://github.com/epigenelabs/pyComBat</a>.</p>
 </div>
 <div class="section" id="license">
 <h2>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h2>
@@ -258,6 +258,7 @@ While the mathematical framework is strictly the same, pyComBat:</p>
 </div>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="c1"># we generate the list of batches</span>
 <span class="n">batch</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">datasets</span> <span class="o">=</span> <span class="p">[</span><span class="n">dataset_1</span><span class="p">,</span><span class="n">dataset_2</span><span class="p">,</span><span class="n">dataset_3</span><span class="p">]</span>
 <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">datasets</span><span class="p">)):</span>
     <span class="n">batch</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">j</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">datasets</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">columns</span><span class="p">))])</span>
 
@@ -302,12 +303,12 @@ While the mathematical framework is strictly the same, pyComBat:</p>
 <dt>Arguments:</dt><dd><p>data {matrix} – The expression matrix (dataframe). It contains the information about the gene expression (rows) for each sample (columns).</p>
 <p>batch {list} – List of batch indexes. The batch list describes the batch for each sample. The batches list has as many elements as the number of columns in the expression matrix.</p>
 </dd>
-<dt>Keyword Arguments:</dt><dd><p>mod {list} – List of covariates indexes. The mod list describes the covariate for each sample. The mod list has as many elements as the number of columns in the expression matrix (default: {[]}).</p>
-<p>par_prior {bool} – False for non-parametric estimation of batch effects (default: {True})</p>
-<p>prior_plots {bool} – True if requires to plot the priors (default: {False} – Not implemented yet!)</p>
-<p>mean_only {bool} – True iff just adjusting the means and not individual batch effects (default: {False})</p>
-<p>ref_batch {int} – reference batch selected (default: {None})</p>
-<p>precision {float} – level of precision for precision computing (default: {None})</p>
+<dt>Keyword Arguments:</dt><dd><p>mod {list} – List (or list of lists) of covariate(s) indexes. The mod list describes the covariate(s) for each sample. Each mod list has as many elements as the number of columns in the expression matrix (default: {[]}).</p>
+<p>par_prior {bool} – False for non-parametric estimation of batch effects (default: {True}).</p>
+<p>prior_plots {bool} – True if requires to plot the priors (default: {False} – Not implemented yet!).</p>
+<p>mean_only {bool} – True iff just adjusting the means and not individual batch effects (default: {False}).</p>
+<p>ref_batch {int} – reference batch selected (default: {None}).</p>
+<p>precision {float} – level of precision for precision computing (default: {None}).</p>
 </dd>
 <dt>Returns:</dt><dd><p>bayes_data_df – The expression dataframe adjusted for batch effects.</p>
 </dd>

@@ -72,6 +72,20 @@ def all_1(list_of_elements):
     """
     return((list_of_elements == 1).all())
 
+
+def covariate_model_matrix(mod):
+    if not isinstance(mod[0],list) :
+        mod_cor = [mod]
+    else:
+        mod_cor = mod
+    cov_dict = {}
+    cov_list = []
+    for i in range(len(mod_cor)):
+        cov_dict[f"mod{str(i)}"] = mod_cor[i]
+        cov_list.append(f"C(mod{str(i)})")
+    return dmatrix(f"~{'+'.join(cov_list)}", cov_dict)
+
+
 # aprior and bprior are useful to compute "hyper-prior values"
 # -> prior parameters used to estimate the prior gamma distribution for multiplicative batch effect
 # aprior - calculates empirical hyper-prior values
@@ -323,7 +337,7 @@ def check_ref_batch(ref_batch, batch, batchmod):
         ref {int list} -- the corresponding positions of the reference batch in the batch list
         batchmod {matrix} -- updated model matrix related to batches, with reference
     """
-    if ref_batch:
+    if ref_batch is not None:
         if ref_batch not in batch:
             print("Reference level ref.batch must be one of the levels of batch.")
             exit(0)
@@ -359,7 +373,7 @@ def treat_batches(batch):
     n_batches = list(map(len, batches))
     if 1 in n_batches:
         #mean_only = True  # no variance if only one sample in a batch - mean_only has to be used
-        print("One batch has only one sample, try setting mean_only=True.")
+        print("\nOne batch has only one sample, try setting mean_only=True.\n")
     n_array = sum(n_batches)
     return(n_batch, batches, n_batches, n_array)
 
@@ -380,7 +394,8 @@ def treat_covariates(batchmod, mod, ref, n_batch):
     if mod == []:
         design = dmatrix("~-1 + batchmod")
     else:
-        mod_matrix = dmatrix("~C(mod)")
+        #mod_matrix = dmatrix("~C(mod)")
+        mod_matrix = covariate_model_matrix(mod)
         design = dmatrix("~-1 + batchmod + mod_matrix")
     # design matrix for sample conditions
     design = np.asarray(design)
@@ -423,7 +438,7 @@ def check_NAs(dat):
     # NAs = True in (np.isnan(dat))
     NAs = np.isnan(np.sum(dat))  # Check if NaN exists
     if NAs:
-        print("Found missing data values.")
+        print("Found missing data values. Please remove all missing values before proceeding with pyComBat.")
     return(NAs)
 
 
@@ -631,17 +646,17 @@ def pycombat(data, batch, mod=[], par_prior=True, prior_plots=False, mean_only=F
         batch {list} -- List of batch indexes. The batch list describes the batch for each sample. The batches list has as many elements as the number of columns in the expression matrix.
 
     Keyword Arguments:
-        mod {list} -- List of covariates indexes. The mod list describes the covariate for each sample. The mod list has as many elements as the number of columns in the expression matrix (default: {[]}).
+        mod {list} -- List (or list of lists) of covariate(s) indexes. The mod list describes the covariate(s) for each sample. Each mod list has as many elements as the number of columns in the expression matrix (default: {[]}).
 
-        par_prior {bool} -- False for non-parametric estimation of batch effects (default: {True})
+        par_prior {bool} -- False for non-parametric estimation of batch effects (default: {True}).
 
-        prior_plots {bool} -- True if requires to plot the priors (default: {False} -- Not implemented yet!)
+        prior_plots {bool} -- True if requires to plot the priors (default: {False} -- Not implemented yet!).
 
-        mean_only {bool} -- True iff just adjusting the means and not individual batch effects (default: {False})
+        mean_only {bool} -- True iff just adjusting the means and not individual batch effects (default: {False}).
 
-        ref_batch {int} -- reference batch selected (default: {None})
+        ref_batch {int} -- reference batch selected (default: {None}).
 
-        precision {float} -- level of precision for precision computing (default: {None})
+        precision {float} -- level of precision for precision computing (default: {None}).
 
     Returns:
         bayes_data_df -- The expression dataframe adjusted for batch effects.
@@ -658,18 +673,21 @@ def pycombat(data, batch, mod=[], par_prior=True, prior_plots=False, mean_only=F
     n_batch, batches, n_batches, n_array = treat_batches(batch)
     design = treat_covariates(batchmod, mod, ref, n_batch)
     NAs = check_NAs(dat)
-    B_hat, grand_mean, var_pooled = calculate_mean_var(
-        design, batches, ref, dat, NAs, ref_batch, n_batches, n_batch, n_array)
-    stand_mean = calculate_stand_mean(
-        grand_mean, n_array, design, n_batch, B_hat)
-    s_data = standardise_data(dat, stand_mean, var_pooled, n_array)
-    gamma_star, delta_star, batch_design = fit_model(
-        design, n_batch, s_data, batches, mean_only, par_prior, precision, ref_batch, ref, NAs)
-    bayes_data = adjust_data(s_data, gamma_star, delta_star, batch_design,
-                             n_batches, var_pooled, stand_mean, n_array, ref_batch, ref, batches, dat)
-    
-    bayes_data_df = pd.DataFrame(bayes_data,
-                 columns = list_samples,
-                 index = list_genes)
+    if not(NAs):
+        B_hat, grand_mean, var_pooled = calculate_mean_var(
+            design, batches, ref, dat, NAs, ref_batch, n_batches, n_batch, n_array)
+        stand_mean = calculate_stand_mean(
+            grand_mean, n_array, design, n_batch, B_hat)
+        s_data = standardise_data(dat, stand_mean, var_pooled, n_array)
+        gamma_star, delta_star, batch_design = fit_model(
+            design, n_batch, s_data, batches, mean_only, par_prior, precision, ref_batch, ref, NAs)
+        bayes_data = adjust_data(s_data, gamma_star, delta_star, batch_design,
+                                n_batches, var_pooled, stand_mean, n_array, ref_batch, ref, batches, dat)
+        
+        bayes_data_df = pd.DataFrame(bayes_data,
+                    columns = list_samples,
+                    index = list_genes)
 
-    return(bayes_data_df)
+        return(bayes_data_df)
+    else:
+        raise ValueError("NaN value is not accepted")

@@ -34,7 +34,7 @@ from patsy import dmatrix
 
 ##########
 # import function used for unit testing
-from .pycombat import model_matrix, all_1
+from .pycombat import model_matrix, all_1, covariate_model_matrix
 from .pycombat import compute_prior, postmean, postvar, it_sol, int_eprior
 from .pycombat import check_mean_only, define_batchmod, check_ref_batch, treat_batches, treat_covariates, check_NAs
 from .pycombat import calculate_mean_var, calculate_stand_mean
@@ -138,6 +138,16 @@ def test_all_1():
 
     assert all_1(np.array([1.5,0.5,1,1,1])) == False # This test to show the limit of the method we use
 
+def test_covariate_model_matrix():
+    mod1 = ["a", "a", "a", "a", "a", "b", "b", "c", "c", "c"]
+    mod2 = ["d", "d", "d", "e", "e", "e", "e", "e", "e", "e"]
+    mod = [mod1, mod2]
+    res = np.asarray(covariate_model_matrix(mod))
+
+    assert len(res) == 10
+    assert len(res[0]) == 4
+    assert list(res[0]) == [1,0,0,0]
+
 # test for check_mean_only
 def test_check_mean_only():
     check_mean_only(True)
@@ -171,7 +181,6 @@ def test_treat_covariates():
 
 # test for check_NAs
 def test_check_NAs():
-    assert check_NAs([np.nan,0,np.nan]) == True
     assert check_NAs([0,1,2]) == False
 
 # test for calculate_mean_var
