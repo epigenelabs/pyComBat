@@ -6,8 +6,6 @@ More detailed documentation can be found at [this address](https://epigenelabs.g
 
 ## TO DO
 
-- [ ] Update unit testing
-
 ## Minimum dependencies
 
 We list here the versions of the packages that have been used for development/testing of pyComBat, as well as for writing the documentation.
