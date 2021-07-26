@@ -84,7 +84,7 @@ The corresponding expression files are available on `GitHub <https://github.com/
     dataset_3 = pd.read_pickle("data/GSE69428.pickle")
 
     # we merge all the datasets into one, by keeping the common genes only
-    df_expression = pd.concat([dataset_1,dataset_2,dataset3],join="inner",axis=1)
+    df_expression = pd.concat([dataset_1,dataset_2,dataset_3],join="inner",axis=1)
 
     # plot raw data
     plt.boxplot(df_expression.transpose())
