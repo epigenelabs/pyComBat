@@ -18,7 +18,7 @@
 
 # file 	pycombat.py
 # author A. Behdenna, J. Haziza, A. Gema, A. Nordor
-# date 	Sept 2020 
+# date 	Sept 2020
 #-----------------------------------------------------------------------------
 
 
@@ -43,7 +43,7 @@ def model_matrix(info, intercept=True, drop_first=True):
     Returns:
         matrix -- model matrix generate from batch list
     """
-    if not isinstance(info[0],list) :
+    if not isinstance(info[0], list):
         info = [info]
     else:
         info = info
@@ -99,8 +99,8 @@ def postmean(g_bar, d_star, t2_n, t2_n_g_hat):
     Arguments:
         g_bar {matrix} -- additive batch effect
         d_star {matrix} -- multiplicative batch effect
-        t2_n {matrix} -- 
-        t2_n_g_hat {matrix} -- 
+        t2_n {matrix} --
+        t2_n_g_hat {matrix} --
 
     Returns:
         matrix -- estimated additive batch effect
@@ -112,8 +112,8 @@ def postvar(sum2, n, a, b):
     """estimates multiplicative batch effect
 
     Arguments:
-        sum2 {vector} -- 
-        n {[type]} -- 
+        sum2 {vector} --
+        n {[type]} --
         a {float} -- aprior
         b {float} -- bprior
 
@@ -127,11 +127,11 @@ def it_sol(sdat, g_hat, d_hat, g_bar, t2, a, b, conv=0.0001, exit_iteration=10e5
     """iterative solution for Empirical Bayesian method
 
     Arguments:
-        sdat {matrix} -- 
+        sdat {matrix} --
         g_hat {matrix} -- average additive batch effect
         d_hat {matrix} -- average multiplicative batch effect
         g_bar {matrix} -- additive batch effect
-        t2 {matrix} -- 
+        t2 {matrix} --
         a {float} -- aprior
         b {float} -- bprior
 
@@ -206,14 +206,17 @@ def int_eprior(sdat, g_hat, d_hat, precision):
         else:  # only if precision parameter informed
             # increase the precision of the computing (if negative exponential too close to 0)
             mp.dps = precision
-            buf_exp = list(map(mp.exp, np.negative(sum2)/(temp_2d)))
-            buf_pow = list(map(partial(mp.power, y=n/2), 1/(np.pi*temp_2d)))
+            buf_exp = np.array(list(map(mp.exp, np.negative(sum2)/(temp_2d))))
+            buf_pow = np.array(list(map(partial(mp.power, y=n/2), 1/(np.pi*temp_2d))))
+            #print(buf_exp.dtype, buf_pow.dtype)
             LH = buf_pow*buf_exp  # likelihood
         # /end{handling high precision computing}
         LH = np.nan_to_num(LH)  # corrects NaNs in likelihood
-        if np.sum(LH) == 0 and test_approximation == 0:  # correction for LH full of 0.0
+        if np.sum(LH) == 0 and test_approximation == 0:
             test_approximation = 1  # this message won't appear again
             print("###\nValues too small, approximation applied to avoid division by 0.\nPrecision mode can correct this problem, but increases computation time.\n###")
+
+        if np.sum(LH) == 0: # correction for LH full of 0.0
             LH[LH == 0] = np.exp(-745)
             g_star.append(np.sum(g*LH)/np.sum(LH))
             d_star.append(np.sum(d*LH)/np.sum(LH))
@@ -229,13 +232,13 @@ def param_fun(i, s_data, batches, mean_only, gamma_hat, gamma_bar, delta_hat, t2
 
     Arguments:
         i {int} -- column index
-        s_data {matrix} -- 
+        s_data {matrix} --
         batches {list list} -- list of list of batches' elements
         mean_only {bool} -- True iff mean_only selected
         gamma_hat {matrix} -- average additive batch effect
         gamma_bar {matrix} -- estimated additive batch effect
         delta_hat {matrix} -- average multiplicative batch effect
-        t2 {matrix} -- 
+        t2 {matrix} --
         a_prior {float} -- aprior
         b_prior {float} -- bprior
 
@@ -261,7 +264,7 @@ def nonparam_fun(i, mean_only, delta_hat, s_data, batches, gamma_hat, precision)
         i {int} -- column index
         mean_only {bool} -- True iff mean_only selected
         delta_hat {matrix} -- estimated multiplicative batch effect
-        s_data {matrix} -- 
+        s_data {matrix} --
         batches {list list} -- list of list of batches' elements
         gamma_hat {matrix} -- estimated additive batch effect
         precision {float} -- level of precision for precision computing
@@ -343,7 +346,7 @@ def treat_batches(batch):
     Returns:
         n_batch {int} -- number of batches
         batches {int list} -- list of unique batches
-        n_batches {int list} -- list of batches lengths 
+        n_batches {int list} -- list of batches lengths
         n_array {int} -- total size of dataset
     """
     n_batch = len(np.unique(batch))  # number of batches
@@ -351,7 +354,7 @@ def treat_batches(batch):
     batches = []  # list of lists, contains the list of position for each batch
     for i in range(n_batch):
         batches.append(np.where(batch == np.unique(batch)[i])[0])
-    batches = np.asarray(batches)
+    batches = np.asarray(batches, dtype=object)
     n_batches = list(map(len, batches))
     if 1 in n_batches:
         #mean_only = True  # no variance if only one sample in a batch - mean_only has to be used
@@ -431,7 +434,7 @@ def calculate_mean_var(design, batches, ref, dat, NAs, ref_batch, n_batches, n_b
         dat {matrix} -- data matrix
         NAs {bool} -- presence of NaNs in the data matrix
         ref_batch {int} -- reference batch
-        n_batches {int list} -- list of batches lengths 
+        n_batches {int list} -- list of batches lengths
         n_array {int} -- total size of dataset
 
     Returns:
@@ -579,7 +582,7 @@ def adjust_data(s_data, gamma_star, delta_star, batch_design, n_batches, var_poo
         gamma_star {matrix} -- estimated additive batch effect
         delta_star {matrix} -- estimated multiplicative batch effect
         batch_design {matrix} -- information about batches in design matrix
-        n_batches {int list} -- list of batches lengths 
+        n_batches {int list} -- list of batches lengths
         stand_mean {matrix} -- standardised mean
         var_pooled {matrix} -- Variance for each gene and each batch
         n_array {int} -- total size of dataset
@@ -617,7 +620,7 @@ def adjust_data(s_data, gamma_star, delta_star, batch_design, n_batches, var_poo
     return bayes_data
 
 
-def pycombat(data, batch, mod=[], par_prior=True, prior_plots=False, mean_only=False, ref_batch=None, precision=None, **kwargs):
+def mycombat(data, batch, mod=[], par_prior=True, prior_plots=False, mean_only=False, ref_batch=None, precision=None, **kwargs):
     """Corrects batch effect in microarray expression data. Takes an gene expression file and a list of known batches corresponding to each sample.
 
     Arguments:
@@ -663,7 +666,7 @@ def pycombat(data, batch, mod=[], par_prior=True, prior_plots=False, mean_only=F
             design, n_batch, s_data, batches, mean_only, par_prior, precision, ref_batch, ref, NAs)
         bayes_data = adjust_data(s_data, gamma_star, delta_star, batch_design,
                                 n_batches, var_pooled, stand_mean, n_array, ref_batch, ref, batches, dat)
-        
+
         bayes_data_df = pd.DataFrame(bayes_data,
                     columns = list_samples,
                     index = list_genes)
