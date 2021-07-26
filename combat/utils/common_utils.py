@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def check_all_ones(list_of_elements:list) -> bool:
+def check_all_ones(list_of_elements: list) -> bool:
     """
     Check if all elements in a list are 1s
 
@@ -17,7 +17,7 @@ def check_all_ones(list_of_elements:list) -> bool:
 def check_mean_only(mean_only: bool) -> None:
     """
     Check mean_only option
-    
+
     Args:
         mean_only (bool): user's choice regarding the mean_only option
     """
@@ -37,5 +37,7 @@ def check_NAs(data):
     # NAs = True in (np.isnan(dat))
     NAs = np.isnan(np.sum(data))  # Check if NaN exists
     if NAs:
-        print("Found missing data values. Please remove all missing values before proceeding with pyComBat.")
+        print(
+            "Found missing data values. Please remove all missing values before proceeding with pyComBat."
+        )
     return NAs

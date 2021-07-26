@@ -1,4 +1,4 @@
-#-----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Copyright (C) 2019-2020 A. Behdenna, A. Nordor, J. Haziza and A. Gema
 
 # This program is free software: you can redistribute it and/or modify
@@ -19,9 +19,7 @@
 # file 	pycombat.py
 # author A. Behdenna, J. Haziza, A. Gema, A. Nordor
 # date Sept 2020
-#-----------------------------------------------------------------------------
-
-
+# -----------------------------------------------------------------------------
 
 
 # this file is only used for unit testing
@@ -42,11 +40,25 @@ print("\n#### Unit Testing for pyComBat ####\n")
 # Define constants for unit testing
 
 batch = np.asarray([1, 1, 1, 2, 2, 3, 3, 3, 3])
-matrix = np.transpose([np.random.normal(size=1000, loc=3, scale=1), np.random.normal(size=1000, loc=3, scale=1), np.random.normal(size=1000, loc=3, scale=1),
-                      np.random.normal(size=1000, loc=2, scale=0.6), np.random.normal(size=1000, loc=2, scale=0.6),
-                      np.random.normal(size=1000, loc=4, scale=1), np.random.normal(size=1000, loc=4, scale=1), np.random.normal(size=1000, loc=4, scale=1), np.random.normal(size=1000, loc=4, scale=1)])
+matrix = np.transpose(
+    [
+        np.random.normal(size=1000, loc=3, scale=1),
+        np.random.normal(size=1000, loc=3, scale=1),
+        np.random.normal(size=1000, loc=3, scale=1),
+        np.random.normal(size=1000, loc=2, scale=0.6),
+        np.random.normal(size=1000, loc=2, scale=0.6),
+        np.random.normal(size=1000, loc=4, scale=1),
+        np.random.normal(size=1000, loc=4, scale=1),
+        np.random.normal(size=1000, loc=4, scale=1),
+        np.random.normal(size=1000, loc=4, scale=1),
+    ]
+)
 
-matrix = pd.DataFrame(data=matrix,columns=["sample_"+str(i+1) for i in range(9)],index=["gene_"+str(i+1) for i in range(1000)])
+matrix = pd.DataFrame(
+    data=matrix,
+    columns=["sample_" + str(i + 1) for i in range(9)],
+    index=["gene_" + str(i + 1) for i in range(1000)],
+)
 
 print("Matrix and batch generated.")
 
@@ -56,6 +68,7 @@ print("Adjusted matrix generated.")
 
 ##########
 # local tests before unit testing
+
 
 def test_means():
     print(f"mean matrix: {np.mean(matrix)}")
@@ -68,5 +81,8 @@ def test_means():
 # general tests on pyComBat
 def test_pycombat():
     assert np.shape(matrix) == np.shape(matrix_adjusted)
-    assert abs(np.mean(matrix.values)-np.mean(matrix_adjusted.values)) <= np.mean(matrix.values)*0.05
+    assert (
+        abs(np.mean(matrix.values) - np.mean(matrix_adjusted.values))
+        <= np.mean(matrix.values) * 0.05
+    )
     assert np.var(matrix_adjusted.values) <= np.var(matrix.values)

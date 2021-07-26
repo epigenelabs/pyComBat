@@ -13,7 +13,9 @@ def test_check_all_ones():
     assert check_all_ones(np.array([1, 1, 1, 1, 0])) == False
     assert check_all_ones(np.array([0, 0, 0, 0, 0])) == False
 
-    assert check_all_ones(np.array([1.5, 0.5, 1, 1, 1])) == False # This test to show the limit of the method we use
+    assert (
+        check_all_ones(np.array([1.5, 0.5, 1, 1, 1])) == False
+    )  # This test to show the limit of the method we use
 
 
 # test for check_mean_only
@@ -25,5 +27,5 @@ def test_check_mean_only():
 
 # test for check_NAs
 def test_check_NAs():
-    assert check_NAs([0,1,2]) == False
-    assert check_NAs([0,np.nan,2]) == True
+    assert check_NAs([0, 1, 2]) == False
+    assert check_NAs([0, np.nan, 2]) == True
