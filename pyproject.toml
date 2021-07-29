@@ -23,6 +23,7 @@ typing-extensions = "^3.10.0"
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.4"
 black = "^21.5b1"
+pytest-cov = "^2.12.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
