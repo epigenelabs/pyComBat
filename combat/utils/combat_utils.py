@@ -44,14 +44,6 @@ def compute_prior(
     -> prior parameters used to estimate the prior gamma distribution for multiplicative batch effect
     aprior - calculates empirical hyper-prior values
 
-    Arguments:
-        prior {char} -- 'a' or 'b' depending of the prior to be calculated
-        gamma_hat {matrix} -- matrix of additive batch effect
-        mean_only {bool} -- True iff mean_only selected
-
-    Returns:
-        float -- [the prior calculated (aprior or bprior)
-
     Args:
         prior (str): 'a' or 'b' depending of the prior to be calculated
         gamma_hat (np.array): [description]
