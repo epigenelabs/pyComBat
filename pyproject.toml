@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "pycombat"
+version = "0.3.1"
+description = "pyComBat is a Python 3 implementation of ComBat, one of the most widely used tool for correcting technical biases, called batch effects, in microarray expression data."
+authors = ["Abdelkader Behdenna <abdelkader@epigenelabs.com>", "Guillaume Appé <guillaume@epigenelabs.com>", "Aryo Gema <aryo@epigenelabs.com>"]
+license = "GPL-3.0-or-later"
+readme = "README.md"
+homepage = "https://github.com/epigenelabs/pyComBat"
+repository = "https://github.com/epigenelabs/pyComBat"
+include = [
+    "LICENSE",
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+numpy = "^1.18.5"
+mpmath = "^1.1.0"
+pandas = "^1.1.5"
+patsy = "^0.5.1"
+scikit-learn = "0.23.1"
+typing-extensions = "^3.10.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.4"
+black = "^21.5b1"
+pytest-cov = "^2.12.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
