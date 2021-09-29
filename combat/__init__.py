@@ -1,2 +1,1 @@
-from .pycombat import PyCombat
-from .pycombat import pycombat
+from .pycombat import PyCombat, pycombat
