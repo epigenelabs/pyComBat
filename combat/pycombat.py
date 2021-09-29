@@ -242,7 +242,7 @@ def pycombat(
     mean_only: bool = False,
     ref_batch: int = None,
     precision: float = None,
-    **kwargs
+    **kwargs,
 ):
     return PyCombat().fit_transform(
         data,
@@ -252,5 +252,5 @@ def pycombat(
         prior_plots=prior_plots,
         mean_only=mean_only,
         ref_batch=ref_batch,
-        precision=precision
+        precision=precision,
     )
