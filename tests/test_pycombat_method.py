@@ -26,12 +26,17 @@
 # We import the function that will be tested one by one, incrementally
 # Generates a report about the functions tested
 
+import os
+import sys
+
+sys.path.append(os.getcwd())
+
 import numpy as np
 import pandas as pd
 
 ##########
 # import function used for unit testing
-from combat import PyCombat
+from combat import pycombat
 
 ##########
 print("\n#### Unit Testing for pyComBat ####\n")
@@ -62,7 +67,7 @@ matrix = pd.DataFrame(
 
 print("Matrix and batch generated.")
 
-matrix_adjusted = PyCombat().fit_transform(matrix, batch)
+matrix_adjusted = pycombat(matrix, batch)
 
 print("Adjusted matrix generated.")
 
