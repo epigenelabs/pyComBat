@@ -208,16 +208,18 @@ def int_eprior(
             # only if precision parameter informed
             # increase the precision of the computing (if negative exponential too close to 0)
             mp.dps = precision
-            buf_exp = list(map(mp.exp, np.negative(sum2) / (temp_2d)))
-            buf_pow = list(map(partial(mp.power, y=n / 2), 1 / (np.pi * temp_2d)))
+            buf_exp = np.array(list(map(mp.exp, np.negative(sum2)/(temp_2d))))
+            buf_pow = np.array(list(map(partial(mp.power, y=n/2), 1/(np.pi*temp_2d))))
             LH = buf_pow * buf_exp  # likelihood
         # /end{handling high precision computing}
         LH = np.nan_to_num(LH)  # corrects NaNs in likelihood
-        if np.sum(LH) == 0 and test_approximation == 0:  # correction for LH full of 0.0
+        if np.sum(LH) == 0 and test_approximation == 0:
             test_approximation = 1  # this message won't appear again
             print(
                 "###\nValues too small, approximation applied to avoid division by 0.\nPrecision mode can correct this problem, but increases computation time.\n###"
             )
+
+        if np.sum(LH) == 0: # correction for LH full of 0.0
             LH[LH == 0] = np.exp(-745)
             g_star.append(np.sum(g * LH) / np.sum(LH))
             d_star.append(np.sum(d * LH) / np.sum(LH))
@@ -432,7 +434,7 @@ def treat_batches(batch: list) -> Tuple[int, List[int], List[int], int]:
     batches = []  # list of lists, contains the list of position for each batch
     for i in range(n_batch):
         batches.append(np.where(batch == np.unique(batch)[i])[0])
-    batches = np.asarray(batches)
+    batches = np.asarray(batches, dtype=np.int32)
     n_batches = list(map(len, batches))
     if 1 in n_batches:
         # mean_only = True  # no variance if only one sample in a batch - mean_only has to be used
