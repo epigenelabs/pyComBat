@@ -231,3 +231,26 @@ class PyCombat(BaseEstimator, TransformerMixin):
         return pd.DataFrame(
             bayes_data, columns=self.list_samples, index=self.list_genes
         )
+
+
+def pycombat(
+    data: pd.DataFrame,
+    batch: list,
+    mod: list = [],
+    par_prior: bool = True,
+    prior_plots: bool = False,
+    mean_only: bool = False,
+    ref_batch: int = None,
+    precision: float = None,
+    **kwargs
+):
+    return PyCombat().fit_transform(
+        data,
+        batch,
+        mod=mod,
+        par_prior=par_prior,
+        prior_plots=prior_plots,
+        mean_only=mean_only,
+        ref_batch=ref_batch,
+        precision=precision
+    )
