@@ -349,6 +349,7 @@ def treat_batches(batch):
         n_batches {int list} -- list of batches lengths
         n_array {int} -- total size of dataset
     """
+    batch = pd.Series(batch)
     n_batch = len(np.unique(batch))  # number of batches
     print("Found "+str(n_batch)+" batches.")
     batches = []  # list of lists, contains the list of position for each batch
