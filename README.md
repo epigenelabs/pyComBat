@@ -14,7 +14,7 @@ We list here the versions of the packages that have been used for development/te
 
 * python 3.6
 
-* numpy 1.16.4
+* numpy 1.18.5
 
 * mpmath 1.1.0
 
