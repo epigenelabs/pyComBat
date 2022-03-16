@@ -36,9 +36,9 @@ pyComBat 0.3.0
 
 * Removed soon deprecated functions calls
 
-## [0.3.0a] - 16-03-2022
+## [0.3.1] - 16-03-2022
 
-pyComBat 0.3.0a
+pyComBat 0.3.1
 
 * Updated copyright
 
