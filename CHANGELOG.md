@@ -35,3 +35,15 @@ pyComBat 0.3.0
 * pyComBat now exits with an informative message when nans are detected
 
 * Removed soon deprecated functions calls
+
+## [0.3.0a] - 16-03-2022
+
+pyComBat 0.3.0a
+
+* Updated copyright
+
+* Updated dependency versions
+
+* Corrected a bug preventing the definition of batches with lists of strings
+
+* Corrected typos in the documentation
