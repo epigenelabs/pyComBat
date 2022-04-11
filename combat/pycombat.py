@@ -30,6 +30,8 @@ from functools import partial
 import mpmath as mp
 import pandas as pd
 
+from combat.exceptions import ConfoundingVariablesError
+
 #import unittest
 
 
@@ -324,8 +326,7 @@ def check_ref_batch(ref_batch, batch, batchmod):
     """
     if ref_batch is not None:
         if ref_batch not in batch:
-            print("Reference level ref.batch must be one of the levels of batch.")
-            exit(0)
+            raise ValueError("Reference level ref.batch must be one of the levels of batch.")
         print("Using batch "+str(ref_batch) +
               " as a reference batch.")
         # ref keeps in memory the columns concerned by the reference batch
@@ -394,18 +395,12 @@ def treat_covariates(batchmod, mod, ref, n_batch):
     # if matrix cannot be invertible, different cases
     if np.linalg.matrix_rank(design) < len(design):
         if len(design) == n_batch + 1:  # case 1: covariate confunded with a batch
-            print(
-                "The covariate is confunded with batch. Remove the covariate and rerun pyComBat.")
-            exit(0)
+            raise ConfoundingVariablesError("Covariate is confounded with batch. Try removing the covariates.")
         if len(design) > n_batch + 1:  # case 2: multiple covariates confunded with a batch
             if np.linalg.matrix_rank(np.transpose(design)[:n_batch]) < len(design):
-                print(
-                    "The covariates are confounded! Please remove one or more of the covariates so the design is not confounded.")
-                exit(0)
+                raise ConfoundingVariablesError("Confounded design. Try removing one or more covariates.")
             else:  # case 3: at least a covariate confunded with a batch
-                print(
-                    "At least one covariate is confounded with batch. Please remove confounded covariates and rerun pyComBat")
-                exit(0)
+                raise ConfoundingVariablesError("At least one covariate is confounded with batch. Try removing confounded covariates.")
     return(design)
 
 
