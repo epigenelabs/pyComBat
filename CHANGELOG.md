@@ -47,3 +47,9 @@ pyComBat 0.3.1
 * Corrected a bug preventing the definition of batches with lists of strings
 
 * Corrected typos in the documentation
+
+## [0.3.2] - 10-06-2022
+
+pyComBat 0.3.2
+
+* Enhanced error handling for confounded variables
