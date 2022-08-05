@@ -147,7 +147,7 @@
             
   <h1>Source code for pycombat</h1><div class="highlight"><pre>
 <span></span><span class="c1">#-----------------------------------------------------------------------------</span>
-<span class="c1"># Copyright (C) 2019-2020 A. Behdenna, A. Nordor, J. Haziza and A. Gema</span>
+<span class="c1"># Copyright (C) 2019-2022 A. Behdenna, A. Nordor, J. Haziza and A. Gema</span>
 
 <span class="c1"># This program is free software: you can redistribute it and/or modify</span>
 <span class="c1"># it under the terms of the GNU General Public License as published by</span>
@@ -166,7 +166,7 @@
 
 <span class="c1"># file 	pycombat.py</span>
 <span class="c1"># author A. Behdenna, J. Haziza, A. Gema, A. Nordor</span>
-<span class="c1"># date 	Sept 2020 </span>
+<span class="c1"># date 	Sept 2020</span>
 <span class="c1">#-----------------------------------------------------------------------------</span>
 
 
@@ -177,36 +177,33 @@
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">import</span> <span class="nn">mpmath</span> <span class="k">as</span> <span class="nn">mp</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">patsy</span> <span class="kn">import</span> <span class="n">dmatrix</span>
+
+<span class="kn">from</span> <span class="nn">combat.exceptions</span> <span class="kn">import</span> <span class="n">ConfoundingVariablesError</span>
 
 <span class="c1">#import unittest</span>
 
 
-<span class="k">def</span> <span class="nf">model_matrix</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">model_matrix</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">intercept</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">drop_first</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Creates the model_matrix from batch list</span>
 
 <span class="sd">    Arguments:</span>
-<span class="sd">        batch {list} -- batch list from main arguments</span>
+<span class="sd">        info {list} -- list info with batch or covariates data</span>
+<span class="sd">        intercept {bool} -- boolean for intercept in model matrix</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        matrix -- model matrix generate from batch list</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># list_elts_batch = list(</span>
-    <span class="c1">#     set(batch))</span>
-    <span class="n">list_elts_batch</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">batch</span><span class="p">)))</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
-    <span class="n">n_batch</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_elts_batch</span><span class="p">)</span>
-    <span class="n">dict_batch</span> <span class="o">=</span> <span class="p">{}</span>
-
-    <span class="n">mat</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_batch</span><span class="p">)]</span>
-
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_batch</span><span class="p">):</span>
-        <span class="n">dict_batch</span><span class="p">[</span><span class="n">list_elts_batch</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">i</span>
-
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
-        <span class="n">mat</span><span class="p">[</span><span class="n">dict_batch</span><span class="p">[</span><span class="n">batch</span><span class="p">[</span><span class="n">i</span><span class="p">]]][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-
-    <span class="k">return</span> <span class="n">mat</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="p">[</span><span class="n">info</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="n">info</span>
+    <span class="n">info_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">info</span><span class="p">)):</span>
+        <span class="n">info_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;col</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span><span class="n">info</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">info_dict</span><span class="p">),</span> <span class="n">drop_first</span><span class="o">=</span><span class="n">drop_first</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">intercept</span><span class="p">:</span>
+        <span class="n">df</span><span class="p">[</span><span class="s2">&quot;intercept&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
 
 
 <span class="k">def</span> <span class="nf">all_1</span><span class="p">(</span><span class="n">list_of_elements</span><span class="p">):</span>
@@ -219,19 +216,6 @@
 <span class="sd">        bool -- True iff all elements of the list are 1s</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span><span class="p">((</span><span class="n">list_of_elements</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">())</span>
-
-
-<span class="k">def</span> <span class="nf">covariate_model_matrix</span><span class="p">(</span><span class="n">mod</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mod</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="nb">list</span><span class="p">)</span> <span class="p">:</span>
-        <span class="n">mod_cor</span> <span class="o">=</span> <span class="p">[</span><span class="n">mod</span><span class="p">]</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">mod_cor</span> <span class="o">=</span> <span class="n">mod</span>
-    <span class="n">cov_dict</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">cov_list</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mod_cor</span><span class="p">)):</span>
-        <span class="n">cov_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;mod</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mod_cor</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-        <span class="n">cov_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;C(mod</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">dmatrix</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;~</span><span class="si">{</span><span class="s1">&#39;+&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cov_list</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">cov_dict</span><span class="p">)</span>
 
 
 <span class="c1"># aprior and bprior are useful to compute &quot;hyper-prior values&quot;</span>
@@ -265,8 +249,8 @@
 <span class="sd">    Arguments:</span>
 <span class="sd">        g_bar {matrix} -- additive batch effect</span>
 <span class="sd">        d_star {matrix} -- multiplicative batch effect</span>
-<span class="sd">        t2_n {matrix} -- </span>
-<span class="sd">        t2_n_g_hat {matrix} -- </span>
+<span class="sd">        t2_n {matrix} --</span>
+<span class="sd">        t2_n_g_hat {matrix} --</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        matrix -- estimated additive batch effect</span>
@@ -278,8 +262,8 @@
     <span class="sd">&quot;&quot;&quot;estimates multiplicative batch effect</span>
 
 <span class="sd">    Arguments:</span>
-<span class="sd">        sum2 {vector} -- </span>
-<span class="sd">        n {[type]} -- </span>
+<span class="sd">        sum2 {vector} --</span>
+<span class="sd">        n {[type]} --</span>
 <span class="sd">        a {float} -- aprior</span>
 <span class="sd">        b {float} -- bprior</span>
 
@@ -293,11 +277,11 @@
     <span class="sd">&quot;&quot;&quot;iterative solution for Empirical Bayesian method</span>
 
 <span class="sd">    Arguments:</span>
-<span class="sd">        sdat {matrix} -- </span>
+<span class="sd">        sdat {matrix} --</span>
 <span class="sd">        g_hat {matrix} -- average additive batch effect</span>
 <span class="sd">        d_hat {matrix} -- average multiplicative batch effect</span>
 <span class="sd">        g_bar {matrix} -- additive batch effect</span>
-<span class="sd">        t2 {matrix} -- </span>
+<span class="sd">        t2 {matrix} --</span>
 <span class="sd">        a {float} -- aprior</span>
 <span class="sd">        b {float} -- bprior</span>
 
@@ -372,14 +356,17 @@
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># only if precision parameter informed</span>
             <span class="c1"># increase the precision of the computing (if negative exponential too close to 0)</span>
             <span class="n">mp</span><span class="o">.</span><span class="n">dps</span> <span class="o">=</span> <span class="n">precision</span>
-            <span class="n">buf_exp</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">mp</span><span class="o">.</span><span class="n">exp</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">negative</span><span class="p">(</span><span class="n">sum2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">temp_2d</span><span class="p">)))</span>
-            <span class="n">buf_pow</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">mp</span><span class="o">.</span><span class="n">power</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">temp_2d</span><span class="p">)))</span>
+            <span class="n">buf_exp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">mp</span><span class="o">.</span><span class="n">exp</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">negative</span><span class="p">(</span><span class="n">sum2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">temp_2d</span><span class="p">))))</span>
+            <span class="n">buf_pow</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">mp</span><span class="o">.</span><span class="n">power</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">n</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">temp_2d</span><span class="p">))))</span>
+            <span class="c1">#print(buf_exp.dtype, buf_pow.dtype)</span>
             <span class="n">LH</span> <span class="o">=</span> <span class="n">buf_pow</span><span class="o">*</span><span class="n">buf_exp</span>  <span class="c1"># likelihood</span>
         <span class="c1"># /end{handling high precision computing}</span>
         <span class="n">LH</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan_to_num</span><span class="p">(</span><span class="n">LH</span><span class="p">)</span>  <span class="c1"># corrects NaNs in likelihood</span>
-        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">LH</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">test_approximation</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># correction for LH full of 0.0</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">LH</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">test_approximation</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">test_approximation</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># this message won&#39;t appear again</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;###</span><span class="se">\n</span><span class="s2">Values too small, approximation applied to avoid division by 0.</span><span class="se">\n</span><span class="s2">Precision mode can correct this problem, but increases computation time.</span><span class="se">\n</span><span class="s2">###&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">LH</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="c1"># correction for LH full of 0.0</span>
             <span class="n">LH</span><span class="p">[</span><span class="n">LH</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">745</span><span class="p">)</span>
             <span class="n">g_star</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">g</span><span class="o">*</span><span class="n">LH</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">LH</span><span class="p">))</span>
             <span class="n">d_star</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">d</span><span class="o">*</span><span class="n">LH</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">LH</span><span class="p">))</span>
@@ -395,13 +382,13 @@
 
 <span class="sd">    Arguments:</span>
 <span class="sd">        i {int} -- column index</span>
-<span class="sd">        s_data {matrix} -- </span>
+<span class="sd">        s_data {matrix} --</span>
 <span class="sd">        batches {list list} -- list of list of batches&#39; elements</span>
 <span class="sd">        mean_only {bool} -- True iff mean_only selected</span>
 <span class="sd">        gamma_hat {matrix} -- average additive batch effect</span>
 <span class="sd">        gamma_bar {matrix} -- estimated additive batch effect</span>
 <span class="sd">        delta_hat {matrix} -- average multiplicative batch effect</span>
-<span class="sd">        t2 {matrix} -- </span>
+<span class="sd">        t2 {matrix} --</span>
 <span class="sd">        a_prior {float} -- aprior</span>
 <span class="sd">        b_prior {float} -- bprior</span>
 
@@ -427,7 +414,7 @@
 <span class="sd">        i {int} -- column index</span>
 <span class="sd">        mean_only {bool} -- True iff mean_only selected</span>
 <span class="sd">        delta_hat {matrix} -- estimated multiplicative batch effect</span>
-<span class="sd">        s_data {matrix} -- </span>
+<span class="sd">        s_data {matrix} --</span>
 <span class="sd">        batches {list list} -- list of list of batches&#39; elements</span>
 <span class="sd">        gamma_hat {matrix} -- estimated additive batch effect</span>
 <span class="sd">        precision {float} -- level of precision for precision computing</span>
@@ -469,7 +456,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        batchmod {matrix} -- model matrix for batches</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">batchmod</span> <span class="o">=</span> <span class="n">model_matrix</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+    <span class="n">batchmod</span> <span class="o">=</span> <span class="n">model_matrix</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">batch</span><span class="p">),</span> <span class="n">intercept</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">drop_first</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">return</span><span class="p">(</span><span class="n">batchmod</span><span class="p">)</span>
 
 
@@ -487,8 +474,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">ref_batch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">ref_batch</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reference level ref.batch must be one of the levels of batch.&quot;</span><span class="p">)</span>
-            <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Reference level ref.batch must be one of the levels of batch.&quot;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using batch &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">ref_batch</span><span class="p">)</span> <span class="o">+</span>
               <span class="s2">&quot; as a reference batch.&quot;</span><span class="p">)</span>
         <span class="c1"># ref keeps in memory the columns concerned by the reference batch</span>
@@ -509,15 +495,15 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        n_batch {int} -- number of batches</span>
 <span class="sd">        batches {int list} -- list of unique batches</span>
-<span class="sd">        n_batches {int list} -- list of batches lengths </span>
+<span class="sd">        n_batches {int list} -- list of batches lengths</span>
 <span class="sd">        n_array {int} -- total size of dataset</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">batch</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
     <span class="n">n_batch</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">batch</span><span class="p">))</span>  <span class="c1"># number of batches</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Found &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">n_batch</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot; batches.&quot;</span><span class="p">)</span>
     <span class="n">batches</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># list of lists, contains the list of position for each batch</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_batch</span><span class="p">):</span>
-        <span class="n">batches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">batch</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">batch</span><span class="p">)[</span><span class="n">i</span><span class="p">])[</span><span class="mi">0</span><span class="p">])</span>
-    <span class="n">batches</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">batches</span><span class="p">)</span>
+        <span class="n">batches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">batch</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">batch</span><span class="p">)[</span><span class="n">i</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">))</span>
     <span class="n">n_batches</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="n">batches</span><span class="p">))</span>
     <span class="k">if</span> <span class="mi">1</span> <span class="ow">in</span> <span class="n">n_batches</span><span class="p">:</span>
         <span class="c1">#mean_only = True  # no variance if only one sample in a batch - mean_only has to be used</span>
@@ -539,14 +525,12 @@
 <span class="sd">        check {bool list} -- a list characterising all covariates</span>
 <span class="sd">        design {matrix} -- model matrix for all covariates, including batch</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">mod</span> <span class="o">==</span> <span class="p">[]:</span>
-        <span class="n">design</span> <span class="o">=</span> <span class="n">dmatrix</span><span class="p">(</span><span class="s2">&quot;~-1 + batchmod&quot;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="c1">#mod_matrix = dmatrix(&quot;~C(mod)&quot;)</span>
-        <span class="n">mod_matrix</span> <span class="o">=</span> <span class="n">covariate_model_matrix</span><span class="p">(</span><span class="n">mod</span><span class="p">)</span>
-        <span class="n">design</span> <span class="o">=</span> <span class="n">dmatrix</span><span class="p">(</span><span class="s2">&quot;~-1 + batchmod + mod_matrix&quot;</span><span class="p">)</span>
     <span class="c1"># design matrix for sample conditions</span>
-    <span class="n">design</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">design</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">mod</span> <span class="o">==</span> <span class="p">[]:</span>
+        <span class="n">design</span> <span class="o">=</span> <span class="n">batchmod</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">mod_matrix</span> <span class="o">=</span> <span class="n">model_matrix</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">intercept</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">design</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">batchmod</span><span class="p">,</span> <span class="n">mod_matrix</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">check</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">all_1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">design</span><span class="p">)))</span>
     <span class="k">if</span> <span class="n">ref</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># if ref</span>
         <span class="n">check</span><span class="p">[</span><span class="n">ref</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># the reference in not considered as a covariate</span>
@@ -559,18 +543,12 @@
     <span class="c1"># if matrix cannot be invertible, different cases</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_rank</span><span class="p">(</span><span class="n">design</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">design</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">design</span><span class="p">)</span> <span class="o">==</span> <span class="n">n_batch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># case 1: covariate confunded with a batch</span>
-            <span class="nb">print</span><span class="p">(</span>
-                <span class="s2">&quot;The covariate is confunded with batch. Remove the covariate and rerun pyComBat.&quot;</span><span class="p">)</span>
-            <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ConfoundingVariablesError</span><span class="p">(</span><span class="s2">&quot;Covariate is confounded with batch. Try removing the covariates.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">design</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">n_batch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># case 2: multiple covariates confunded with a batch</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">matrix_rank</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">design</span><span class="p">)[:</span><span class="n">n_batch</span><span class="p">])</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">design</span><span class="p">):</span>
-                <span class="nb">print</span><span class="p">(</span>
-                    <span class="s2">&quot;The covariates are confounded! Please remove one or more of the covariates so the design is not confounded.&quot;</span><span class="p">)</span>
-                <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">ConfoundingVariablesError</span><span class="p">(</span><span class="s2">&quot;Confounded design. Try removing one or more covariates.&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>  <span class="c1"># case 3: at least a covariate confunded with a batch</span>
-                <span class="nb">print</span><span class="p">(</span>
-                    <span class="s2">&quot;At least one covariate is confounded with batch. Please remove confounded covariates and rerun pyComBat&quot;</span><span class="p">)</span>
-                <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">ConfoundingVariablesError</span><span class="p">(</span><span class="s2">&quot;At least one covariate is confounded with batch. Try removing confounded covariates.&quot;</span><span class="p">)</span>
     <span class="k">return</span><span class="p">(</span><span class="n">design</span><span class="p">)</span>
 
 
@@ -599,7 +577,7 @@
 <span class="sd">        dat {matrix} -- data matrix</span>
 <span class="sd">        NAs {bool} -- presence of NaNs in the data matrix</span>
 <span class="sd">        ref_batch {int} -- reference batch</span>
-<span class="sd">        n_batches {int list} -- list of batches lengths </span>
+<span class="sd">        n_batches {int list} -- list of batches lengths</span>
 <span class="sd">        n_array {int} -- total size of dataset</span>
 
 <span class="sd">    Returns:</span>
@@ -747,7 +725,7 @@
 <span class="sd">        gamma_star {matrix} -- estimated additive batch effect</span>
 <span class="sd">        delta_star {matrix} -- estimated multiplicative batch effect</span>
 <span class="sd">        batch_design {matrix} -- information about batches in design matrix</span>
-<span class="sd">        n_batches {int list} -- list of batches lengths </span>
+<span class="sd">        n_batches {int list} -- list of batches lengths</span>
 <span class="sd">        stand_mean {matrix} -- standardised mean</span>
 <span class="sd">        var_pooled {matrix} -- Variance for each gene and each batch</span>
 <span class="sd">        n_array {int} -- total size of dataset</span>
@@ -816,7 +794,7 @@
 
     <span class="n">check_mean_only</span><span class="p">(</span><span class="n">mean_only</span><span class="p">)</span>
 
-    <span class="n">batchmod</span> <span class="o">=</span> <span class="n">dmatrix</span><span class="p">(</span><span class="s2">&quot;~-1 + C(batch)&quot;</span><span class="p">)</span>
+    <span class="n">batchmod</span> <span class="o">=</span> <span class="n">define_batchmod</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
     <span class="n">ref</span><span class="p">,</span> <span class="n">batchmod</span> <span class="o">=</span> <span class="n">check_ref_batch</span><span class="p">(</span><span class="n">ref_batch</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">batchmod</span><span class="p">)</span>
     <span class="n">n_batch</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">n_batches</span><span class="p">,</span> <span class="n">n_array</span> <span class="o">=</span> <span class="n">treat_batches</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
     <span class="n">design</span> <span class="o">=</span> <span class="n">treat_covariates</span><span class="p">(</span><span class="n">batchmod</span><span class="p">,</span> <span class="n">mod</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">)</span>
@@ -831,7 +809,7 @@
             <span class="n">design</span><span class="p">,</span> <span class="n">n_batch</span><span class="p">,</span> <span class="n">s_data</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">mean_only</span><span class="p">,</span> <span class="n">par_prior</span><span class="p">,</span> <span class="n">precision</span><span class="p">,</span> <span class="n">ref_batch</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">NAs</span><span class="p">)</span>
         <span class="n">bayes_data</span> <span class="o">=</span> <span class="n">adjust_data</span><span class="p">(</span><span class="n">s_data</span><span class="p">,</span> <span class="n">gamma_star</span><span class="p">,</span> <span class="n">delta_star</span><span class="p">,</span> <span class="n">batch_design</span><span class="p">,</span>
                                 <span class="n">n_batches</span><span class="p">,</span> <span class="n">var_pooled</span><span class="p">,</span> <span class="n">stand_mean</span><span class="p">,</span> <span class="n">n_array</span><span class="p">,</span> <span class="n">ref_batch</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">dat</span><span class="p">)</span>
-        
+
         <span class="n">bayes_data_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">bayes_data</span><span class="p">,</span>
                     <span class="n">columns</span> <span class="o">=</span> <span class="n">list_samples</span><span class="p">,</span>
                     <span class="n">index</span> <span class="o">=</span> <span class="n">list_genes</span><span class="p">)</span>
