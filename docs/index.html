@@ -248,7 +248,7 @@ While the mathematical framework is strictly the same, pyComBat:</p>
 <span class="n">df_expression</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">dataset_1</span><span class="p">,</span><span class="n">dataset_2</span><span class="p">,</span><span class="n">dataset_3</span><span class="p">],</span><span class="n">join</span><span class="o">=</span><span class="s2">&quot;inner&quot;</span><span class="p">,</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="c1"># plot raw data</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">df_expression</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">df_expression</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -266,7 +266,7 @@ While the mathematical framework is strictly the same, pyComBat:</p>
 <span class="n">df_corrected</span> <span class="o">=</span> <span class="n">pycombat</span><span class="p">(</span><span class="n">df_expression</span><span class="p">,</span><span class="n">batch</span><span class="p">)</span>
 
 <span class="c1"># visualise results</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">df_corrected</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">df_corrected</span><span class="p">)</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 </div>

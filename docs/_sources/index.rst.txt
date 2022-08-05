@@ -87,7 +87,7 @@ The corresponding expression files are available on `GitHub <https://github.com/
     df_expression = pd.concat([dataset_1,dataset_2,dataset_3],join="inner",axis=1)
 
     # plot raw data
-    plt.boxplot(df_expression.transpose())
+    plt.boxplot(df_expression)
     plt.show()
 
 .. figure:: distrib_raw.png
@@ -108,7 +108,7 @@ The corresponding expression files are available on `GitHub <https://github.com/
     df_corrected = pycombat(df_expression,batch)
 
     # visualise results
-    plt.boxplot(df_corrected.transpose())
+    plt.boxplot(df_corrected)
     plt.show()
 
 .. figure:: distrib_corrected.png
