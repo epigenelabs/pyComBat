@@ -143,7 +143,7 @@ def test_all_1():
 
 # tests for remove_zero_variance_genes function
 def test_remove_zero_variance_genes():
-    batches = [np.array([1,2,3,4]), np.array([5,6,7]), np.array([8,9])]
+    batches = [np.array([0,1,2,3]), np.array([4,5,6]), np.array([7,8])]
     dat = np.array([[0,0,0,0,1,2,1,3,4],
                     [0,1,2,3,0,1,2,1,2],
                     [0,1,1,2,2,3,2,1,2],
