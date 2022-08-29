@@ -149,9 +149,10 @@ def test_remove_zero_variance_genes():
                     [0,1,1,2,2,3,2,1,2],
                     [1,2,2,1,0,0,0,1,1]])
     reduced_dat, genes_to_remove = remove_zero_variance_genes(dat, batches)
+    print(genes_to_remove)
 
     assert reduced_dat.shape == (2, 9)
-    assert genes_to_remove == np.array([ True, False, False,  True])
+    assert all([a == b for a, b in zip(genes_to_remove, np.array([ True, False, False,  True]))])
 
 
 # test for check_mean_only
