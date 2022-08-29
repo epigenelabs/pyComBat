@@ -40,6 +40,7 @@ from .pycombat import compute_prior, postmean, postvar, it_sol, int_eprior
 from .pycombat import check_mean_only, define_batchmod, check_ref_batch, treat_batches, treat_covariates, check_NAs
 from .pycombat import calculate_mean_var, calculate_stand_mean
 from .pycombat import standardise_data, fit_model, adjust_data
+from .pycombat import remove_zero_variance_genes
 from .pycombat import pycombat
 
 ##########
@@ -138,6 +139,20 @@ def test_all_1():
     assert all_1(np.array([0,0,0,0,0])) == False
 
     assert all_1(np.array([1.5,0.5,1,1,1])) == False # This test to show the limit of the method we use
+
+
+# tests for remove_zero_variance_genes function
+def test_remove_zero_variance_genes():
+    batches = [np.array([0,1,2,3]), np.array([4,5,6]), np.array([7,8])]
+    dat = np.array([[0,0,0,0,1,2,1,3,4],
+                    [0,1,2,3,0,1,2,1,2],
+                    [0,1,1,2,2,3,2,1,2],
+                    [1,2,2,1,0,0,0,1,1]])
+    reduced_dat, genes_to_remove = remove_zero_variance_genes(dat, batches)
+    print(genes_to_remove)
+
+    assert reduced_dat.shape == (2, 9)
+    assert all([a == b for a, b in zip(genes_to_remove, np.array([ True, False, False,  True]))])
 
 
 # test for check_mean_only
