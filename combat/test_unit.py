@@ -34,13 +34,13 @@ import pandas as pd
 
 ##########
 # import function used for unit testing
-from pycombat import model_matrix, all_1
+from .pycombat import model_matrix, all_1
 #covariate_model_matrix
-from pycombat import compute_prior, postmean, postvar, it_sol, int_eprior
-from pycombat import check_mean_only, define_batchmod, check_ref_batch, treat_batches, treat_covariates, check_NAs
-from pycombat import calculate_mean_var, calculate_stand_mean
-from pycombat import standardise_data, fit_model, adjust_data
-from pycombat import pycombat
+from .pycombat import compute_prior, postmean, postvar, it_sol, int_eprior
+from .pycombat import check_mean_only, define_batchmod, check_ref_batch, treat_batches, treat_covariates, check_NAs
+from .pycombat import calculate_mean_var, calculate_stand_mean
+from .pycombat import standardise_data, fit_model, adjust_data
+from .pycombat import pycombat
 
 ##########
 print("\n#### Unit Testing for pyComBat ####\n")
