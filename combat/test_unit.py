@@ -18,7 +18,7 @@
 
 # file 	pycombat.py
 # author A. Behdenna, J. Haziza, A. Gema, A. Nordor
-# date 	Sept 2020 
+# date 	Sept 2020
 #-----------------------------------------------------------------------------
 
 
@@ -91,11 +91,11 @@ ref,batchmod = check_ref_batch(ref_batch,batch,batchmod)
 n_batch, batches, n_batches, n_array = treat_batches(batch)
 design = treat_covariates(batchmod, mod, ref, n_batch)
 NAs = check_NAs(dat)
-B_hat, grand_mean, var_pooled = calculate_mean_var(design, batches, ref, dat, NAs, ref_batch, n_batches, n_batch, n_array)
+B_hat, grand_mean, var_pooled = calculate_mean_var(design, batches, ref, dat, NAs, n_batches, n_batch, n_array)
 stand_mean = calculate_stand_mean(grand_mean, n_array, design, n_batch,B_hat)
 s_data = standardise_data(dat, stand_mean, var_pooled, n_array)
-gamma_star, delta_star, batch_design = fit_model(design,n_batch,s_data, batches, mean_only, par_prior, precision, ref_batch, ref, NAs)
-bayes_data = adjust_data(s_data, gamma_star, delta_star, batch_design, n_batches, var_pooled, stand_mean, n_array, ref_batch, ref, batches, dat)
+gamma_star, delta_star, batch_design = fit_model(design,n_batch,s_data, batches, mean_only, par_prior, precision, ref, NAs)
+bayes_data = adjust_data(s_data, gamma_star, delta_star, batch_design, n_batches, var_pooled, stand_mean, n_array, ref, batches, dat)
 
 
 ##########
@@ -157,7 +157,7 @@ def test_check_ref_batch():
     print("Using batch 1 then 2. Above lines should inform on that.")
     assert check_ref_batch(None,batch,batchmod) == (None, batchmod)
 
-# test for treat_batches 
+# test for treat_batches
 def test_treat_batches():
     assert n_batch == 3
     assert batches[0].tolist() == [0,1,2]
@@ -165,7 +165,7 @@ def test_treat_batches():
     assert batches[2].tolist() == [5,6,7,8]
     assert n_batches == [3,2,4]
     assert n_array == 9
- 
+
 # test for treat_covariates
 def test_treat_covariates():
     batchmod = define_batchmod(batch)

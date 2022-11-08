@@ -316,12 +316,12 @@ def check_ref_batch(ref_batch, batch, batchmod):
     """check ref_batch option and treat it if needed
 
     Arguments:
-        ref_batch {int} -- the reference batch
+        ref_batch -- the reference batch
         batch {list} -- list of batch id
         batchmod {matrix} -- model matrix related to batches
 
     Returns:
-        ref {int list} -- the corresponding positions of the reference batch in the batch list
+        ref {int} -- the index of the reference batch in the batch list
         batchmod {matrix} -- updated model matrix related to batches, with reference
     """
     if ref_batch is not None:
@@ -370,7 +370,7 @@ def treat_covariates(batchmod, mod, ref, n_batch):
     Arguments:
         batchmod {matrix} -- model matrix for batch
         mod {matrix} -- model matrix for other covariates
-        ref {int} -- reference batch
+        ref {int} -- index of reference batch
         n_batch {int} -- number of batches
 
     Returns:
@@ -385,7 +385,7 @@ def treat_covariates(batchmod, mod, ref, n_batch):
         design = np.concatenate((batchmod, mod_matrix), axis=1)
     check = list(map(all_1, np.transpose(design)))
     if ref is not None:  # if ref
-        check[ref] = False  # the reference in not considered as a covariate
+        check[ref] = False  # the reference batch is not considered a covariate
     design = design[:, ~np.array(check)]
     design = np.transpose(design)
 
@@ -420,15 +420,15 @@ def check_NAs(dat):
     return(NAs)
 
 
-def calculate_mean_var(design, batches, ref, dat, NAs, ref_batch, n_batches, n_batch, n_array):
+def calculate_mean_var(design, batches, ref, dat, NAs, n_batches, n_batch, n_array):
     """ calculates the Normalisation factors
 
     Arguments:
         design {matrix} -- model matrix for all covariates
         batches {int list} -- list of unique batches
+        ref {int} -- reference batch index
         dat {matrix} -- data matrix
         NAs {bool} -- presence of NaNs in the data matrix
-        ref_batch {int} -- reference batch
         n_batches {int list} -- list of batches lengths
         n_array {int} -- total size of dataset
 
@@ -444,14 +444,14 @@ def calculate_mean_var(design, batches, ref, dat, NAs, ref_batch, n_batches, n_b
             design)), np.dot(design, np.transpose(dat)))
 
     # Calculates the general mean
-    if ref_batch is not None:
+    if ref is not None:
         grand_mean = np.transpose(B_hat[ref])
     else:
         grand_mean = np.dot(np.transpose(
             [i / n_array for i in n_batches]), B_hat[0:n_batch])
     # Calculates the general variance
     if not NAs:  # NAs not supported
-        if ref_batch is not None:  # depending on ref batch
+        if ref is not None:  # depending on ref batch
             ref_dat = np.transpose(np.transpose(dat)[batches[ref]])
             var_pooled = np.dot(np.square(ref_dat - np.transpose(np.dot(np.transpose(
                 design)[batches[ref]], B_hat))), [1/n_batches[ref]]*n_batches[ref])
@@ -502,7 +502,7 @@ def standardise_data(dat, stand_mean, var_pooled, n_array):
     return(s_data)
 
 
-def fit_model(design, n_batch, s_data, batches, mean_only, par_prior, precision, ref_batch, ref, NAs):
+def fit_model(design, n_batch, s_data, batches, mean_only, par_prior, precision, ref, NAs):
     print("Fitting L/S model and finding priors.")
 
     # fraction of design matrix related to batches
@@ -561,7 +561,7 @@ def fit_model(design, n_batch, s_data, batches, mean_only, par_prior, precision,
         gamma_star[i], delta_star[i] = results_i[0], results_i[1]
 
     # update if reference batch (the reference batch is not supposed to be modified)
-    if ref_batch:
+    if ref is not None:
         len_gamma_star_ref = len(gamma_star[ref])
         gamma_star[ref] = [0] * len_gamma_star_ref
         delta_star[ref] = [1] * len_gamma_star_ref
@@ -569,7 +569,7 @@ def fit_model(design, n_batch, s_data, batches, mean_only, par_prior, precision,
     return(gamma_star, delta_star, batch_design)
 
 
-def adjust_data(s_data, gamma_star, delta_star, batch_design, n_batches, var_pooled, stand_mean, n_array, ref_batch, ref, batches, dat):
+def adjust_data(s_data, gamma_star, delta_star, batch_design, n_batches, var_pooled, stand_mean, n_array, ref, batches, dat):
     """Adjust the data -- corrects for estimated batch effects
 
     Arguments:
@@ -581,8 +581,7 @@ def adjust_data(s_data, gamma_star, delta_star, batch_design, n_batches, var_poo
         stand_mean {matrix} -- standardised mean
         var_pooled {matrix} -- Variance for each gene and each batch
         n_array {int} -- total size of dataset
-        ref_batch {int} -- reference batch
-        ref {int list} -- the corresponding positions of the reference batch in the batch list
+        ref {int} -- the index of the reference batch in the batch list
         batches {int list} -- list of unique batches
         dat
 
@@ -608,7 +607,7 @@ def adjust_data(s_data, gamma_star, delta_star, batch_design, n_batches, var_poo
         np.sqrt(var_pooled), np.asarray([1]*n_array))) + stand_mean
 
     # correction for reference batch
-    if ref_batch:
+    if ref is not None:
         bayes_data[batches[ref]] = dat[batches[ref]]
 
     # returns the data corrected for batch effects
@@ -632,7 +631,7 @@ def pycombat(data, batch, mod=[], par_prior=True, prior_plots=False, mean_only=F
 
         mean_only {bool} -- True iff just adjusting the means and not individual batch effects (default: {False}).
 
-        ref_batch {int} -- reference batch selected (default: {None}).
+        ref_batch -- reference batch selected (default: {None}).
 
         precision {float} -- level of precision for precision computing (default: {None}).
 
@@ -653,14 +652,14 @@ def pycombat(data, batch, mod=[], par_prior=True, prior_plots=False, mean_only=F
     NAs = check_NAs(dat)
     if not(NAs):
         B_hat, grand_mean, var_pooled = calculate_mean_var(
-            design, batches, ref, dat, NAs, ref_batch, n_batches, n_batch, n_array)
+            design, batches, ref, dat, NAs, n_batches, n_batch, n_array)
         stand_mean = calculate_stand_mean(
             grand_mean, n_array, design, n_batch, B_hat)
         s_data = standardise_data(dat, stand_mean, var_pooled, n_array)
         gamma_star, delta_star, batch_design = fit_model(
-            design, n_batch, s_data, batches, mean_only, par_prior, precision, ref_batch, ref, NAs)
+            design, n_batch, s_data, batches, mean_only, par_prior, precision, ref, NAs)
         bayes_data = adjust_data(s_data, gamma_star, delta_star, batch_design,
-                                n_batches, var_pooled, stand_mean, n_array, ref_batch, ref, batches, dat)
+                                n_batches, var_pooled, stand_mean, n_array, ref, batches, dat)
 
         bayes_data_df = pd.DataFrame(bayes_data,
                     columns = list_samples,
