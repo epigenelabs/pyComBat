@@ -11,7 +11,7 @@ setuptools.setup(
         "patsy>=0.5.1"
     ],
     name="combat",
-    version="0.3.2",
+    version="0.3.3",
     author="Abdelkader Behdenna",
     author_email="abdelkader@epigenelabs.com",
     description="pyComBat, a Python tool for batch effects correction in high-throughput molecular data using empirical Bayes methods",
