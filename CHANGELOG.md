@@ -53,3 +53,9 @@ pyComBat 0.3.1
 pyComBat 0.3.2
 
 * Enhanced error handling for confounded variables
+
+## [0.3.3] - 29-11-2022
+
+pyComBat 0.3.3
+
+* Loose dependencies versions constrains handling last releases
