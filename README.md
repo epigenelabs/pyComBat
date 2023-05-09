@@ -1,3 +1,9 @@
+# MIGRATION WARNING
+
+pyComBat has been merged into [InMoose](https://github.com/inmoose), and is no
+longer maintained as a standalone package.
+This repository remains up for reference, but will no longer be updated.
+
 # pyComBat
 
 pyComBat [1] is a Python 3 implementation of ComBat [2], one of the most widely used tool for correcting technical biases, called batch effects, in microarray expression data.
