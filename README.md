@@ -1,6 +1,6 @@
 # MIGRATION WARNING
 
-pyComBat has been merged into [InMoose](https://github.com/inmoose), and is no
+pyComBat has been merged into [InMoose](https://github.com/epigenelabs/inmoose), and is no
 longer maintained as a standalone package.
 This repository remains up for reference, but will no longer be updated.
 
