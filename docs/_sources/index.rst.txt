@@ -6,6 +6,12 @@
 Welcome to pyComBat's documentation!
 ====================================
 
+.. warning::
+   This package is now deprecated, and no longer maintained in its standalone
+   version.  It has been merged into `inmoose
+   <https://github.com/epigenelabs/inmoose>`_.  Please consider migrating your
+   code to ``inmoose``.
+
 General Overview
 ----------------
 
