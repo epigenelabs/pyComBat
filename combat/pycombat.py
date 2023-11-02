@@ -88,7 +88,7 @@ def compute_prior(prior, gamma_hat, mean_only):
     if mean_only:
         return 1
     m = np.mean(gamma_hat)
-    s2 = np.var(gamma_hat)
+    s2 = np.var(gamma_hat, ddof=1)
     if prior == 'a':
         return (2*s2+m*m)/s2
     elif prior == 'b':
@@ -521,11 +521,11 @@ def fit_model(design, n_batch, s_data, batches, mean_only, par_prior, precision,
     else:
         for i in batches:  # feed incrementally delta_hat
             list_map = np.transpose(np.transpose(s_data)[i]).var(
-                axis=1)  # variance for each row
+                axis=1, ddof=1)  # variance for each row
             delta_hat.append(np.squeeze(np.asarray(list_map)))
 
     gamma_bar = list(map(np.mean, gamma_hat))  # vector of means for gamma_hat
-    t2 = list(map(np.var, gamma_hat))  # vector of variances for gamma_hat
+    t2 = gamma_hat.var(axis=1, ddof=1).flatten().tolist()[0]  # vector of variances for gamma_hat
 
     # calculates hyper priors for gamma (additive batch effect)
     a_prior = list(
