@@ -5,13 +5,13 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     install_requires=[
-        "numpy>=1.18.5,<=1.19.5",
+        "numpy>=1.18.5",
         "mpmath>=1.1.0",
-        "pandas>=0.24.2,<=1.1.5",
-        "patsy==0.5.1"
+        "pandas>=0.24.2",
+        "patsy>=0.5.1"
     ],
     name="combat",
-    version="0.3.2",
+    version="0.3.3",
     author="Abdelkader Behdenna",
     author_email="abdelkader@epigenelabs.com",
     description="pyComBat, a Python tool for batch effects correction in high-throughput molecular data using empirical Bayes methods",

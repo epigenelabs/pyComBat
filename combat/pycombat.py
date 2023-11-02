@@ -24,8 +24,6 @@
 
 
 import numpy as np
-from math import exp
-from multiprocessing import Pool, cpu_count
 from functools import partial
 import mpmath as mp
 import pandas as pd
@@ -144,8 +142,7 @@ def it_sol(sdat, g_hat, d_hat, g_bar, t2, a, b, conv=0.0001, exit_iteration=10e5
     Returns:
         array list -- estimated additive and multiplicative batch effect
     """
-
-    n = [len(i) for i in np.asarray(sdat)]
+    n = [len(i) for i in sdat]
     t2_n = np.multiply(t2, n)
     t2_n_g_hat = np.multiply(t2_n, g_hat)
     g_old = np.ndarray.copy(g_hat)
@@ -163,7 +160,7 @@ def it_sol(sdat, g_hat, d_hat, g_bar, t2, a, b, conv=0.0001, exit_iteration=10e5
         g_old = np.ndarray.copy(g_new)  # save value for g
         d_old = np.ndarray.copy(d_new)  # save value for d
         count += 1
-    adjust = np.asarray([g_new, d_new])
+    adjust = np.asarray([g_new, d_new], dtype=object)
     return(adjust)  # remove parenthesis in returns
 
 # int_eprior - Monte Carlo integration function to find nonparametric adjustments
@@ -191,10 +188,10 @@ def int_eprior(sdat, g_hat, d_hat, precision):
     test_approximation = 0
     for i in range(len(sdat)):
         # additive batch effect
-        g = np.asarray(np.delete(np.transpose(g_hat), i))
+        g = np.delete(np.transpose(g_hat), i)
         # multiplicative batch effect
         d = np.asarray(np.delete(np.transpose(d_hat), i))
-        x = np.asarray(np.transpose(sdat[i]))
+        x = np.expand_dims(np.transpose(sdat[i]), axis=1)
         n = len(x)
         j = [1]*n
         dat = np.repeat(x, len(np.transpose(g)), axis=1)
@@ -247,14 +244,15 @@ def param_fun(i, s_data, batches, mean_only, gamma_hat, gamma_bar, delta_hat, t2
     Returns:
         array list -- estimated adjusted additive and multiplicative batch effect
     """
+    g_hat = np.expand_dims(gamma_hat[i], axis=0)
     if mean_only:  # if mean_only, no need for complex method: batch effect is immediately calculated
         t2_n = np.multiply(t2[i], 1)
-        t2_n_g_hat = np.multiply(t2_n, gamma_hat[i])
+        t2_n_g_hat = np.multiply(t2_n, g_hat)
         gamma_star = postmean(gamma_bar[i], 1, t2_n, t2_n_g_hat)  # additive batch effect
         delta_star = [1]*len(s_data)  # multiplicative batch effect
     else:  # if not(mean_only) then use it_solve
         temp = it_sol(np.transpose(np.transpose(s_data)[
-                      batches[i]]), gamma_hat[i], delta_hat[i], gamma_bar[i], t2[i], a_prior[i], b_prior[i])
+                      batches[i]]), g_hat, delta_hat[i], gamma_bar[i], t2[i], a_prior[i], b_prior[i])
         gamma_star = temp[0]  # additive batch effect
         delta_star = temp[1]  # multiplicative batch effect
     return [gamma_star, delta_star]
@@ -278,7 +276,7 @@ def nonparam_fun(i, mean_only, delta_hat, s_data, batches, gamma_hat, precision)
         delta_hat[i] = [1]*len(delta_hat[i])
     # use int_eprior for non-parametric estimation
     temp = int_eprior(np.transpose(np.transpose(s_data)[
-                      batches[i]]), gamma_hat[i], delta_hat[i], precision)
+                      batches[i]]), np.expand_dims(gamma_hat[i], axis=0), delta_hat[i], precision)
     return [temp[0], temp[1]]
 
 ############
@@ -475,7 +473,7 @@ def calculate_stand_mean(grand_mean, n_array, design, n_batch, B_hat):
     Returns:
         stand_mean {matrix} -- standardised mean
     """
-    stand_mean = np.dot(np.transpose(np.mat(grand_mean)), np.mat([1]*n_array))
+    stand_mean = np.dot(np.transpose(np.expand_dims(grand_mean, axis=0)), np.array([[1]*n_array]))
     # corrects the mean with design matrix information
     if design is not None:
         tmp = np.ndarray.copy(design)
@@ -497,8 +495,8 @@ def standardise_data(dat, stand_mean, var_pooled, n_array):
     Returns:
         s_data {matrix} -- standardised data matrix
     """
-    s_data = (dat - stand_mean) / \
-        np.dot(np.transpose(np.mat(np.sqrt(var_pooled))), np.mat([1]*n_array))
+    s_data = np.divide((dat - stand_mean), \
+        np.dot(np.transpose(np.expand_dims(np.sqrt(var_pooled), axis=0)), np.array([[1]*n_array])))
     return(s_data)
 
 
